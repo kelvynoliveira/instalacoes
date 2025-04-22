@@ -19,6 +19,40 @@
     <button id="logout-btn" style="display:none;">Logout</button>
     <span id="user-info"></span>
   </div>
+  <div id="side-panel" class="hidden">
+    <h2 id="panel-title">Campus</h2>
+    <form id="campus-form">
+      <label>Tipo de equipamento</label>
+      <select id="tipo">
+        <option value="switch">Switch</option>
+        <option value="ap">Access Point</option>
+        <option value="nobreak">Nobreak</option>
+        <option value="filtro">Filtro de Linha</option>
+      </select>
+  
+      <label>Quantidade</label>
+      <input type="number" id="quantidade" required>
+  
+      <label>Status</label>
+      <select id="status">
+        <option value="aguardando">Aguardando entrega</option>
+        <option value="entregue">Entregue</option>
+        <option value="instalando">Em instalação</option>
+        <option value="instalado">Instalado</option>
+        <option value="testado">Testado</option>
+      </select>
+  
+      <label>Data de instalação</label>
+      <input type="date" id="data">
+  
+      <label>Observações</label>
+      <textarea id="obs"></textarea>
+  
+      <button type="submit">Salvar</button>
+      <button type="button" id="fechar-painel">Fechar</button>
+    </form>
+  </div>
+  
   <script type="module" src="js/app.js"></script>
 </body>
 </html>
