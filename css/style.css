@@ -1,0 +1,23 @@
+
+body, html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: sans-serif;
+}
+
+#map {
+  height: 100vh;
+  width: 100vw;
+}
+
+#login-panel {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 1000;
+  background-color: rgba(0,0,0,0.7);
+  padding: 10px;
+  border-radius: 8px;
+  color: white;
+}
