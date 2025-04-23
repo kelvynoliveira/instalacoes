@@ -54,6 +54,17 @@
   </div>
   
   <script type="module" src="js/app.js">
+campi.forEach(campus => {
+  const popupContent = `
+    <strong>${campus.Marca}</strong><br>
+    ${campus.Campus}<br>
+    ${campus.Cidade} - ${campus.Estado}<br>
+    <button onclick="abrirPainel('${campus.Marca}', '${campus.Campus}')">Atualizar status</button>
+  `;
+  L.marker([campus.Latitude, campus.Longitude])
+    .bindPopup(popupContent)
+    .addTo(map);
+});
 
 
 
