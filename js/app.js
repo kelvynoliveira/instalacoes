@@ -44,4 +44,25 @@ L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
   maxZoom: 18
 }).addTo(map);
 
+campi.forEach(campus => {
+  const popupContent = `
+    <strong>${campus.Marca}</strong><br>
+    ${campus.Campus}<br>
+    ${campus.Cidade} - ${campus.Estado}<br>
+    <button onclick="abrirPainel('${campus.Marca}', '${campus.Campus}')">Atualizar status</button>
+  `;
+  L.marker([campus.Latitude, campus.Longitude])
+    .bindPopup(popupContent)
+    .addTo(map);
+});
+
+
 // Aqui podemos buscar os dados do Firestore no futuro
+function abrirPainel(marca, campus) {
+  document.getElementById("side-panel").classList.remove("hidden");
+  document.getElementById("panel-title").innerText = `${marca} - ${campus}`;
+  document.getElementById("campus-form").setAttribute("data-campus", `${marca}|${campus}`);
+}
+document.getElementById("fechar-painel").addEventListener("click", () => {
+  document.getElementById("side-panel").classList.add("hidden");
+});

@@ -54,19 +54,6 @@
   </div>
   
   <script type="module" src="js/app.js">
-campi.forEach(campus => {
-  const popupContent = `
-    <strong>${campus.Marca}</strong><br>
-    ${campus.Campus}<br>
-    ${campus.Cidade} - ${campus.Estado}<br>
-    <button onclick="abrirPainel('${campus.Marca}', '${campus.Campus}')">Atualizar status</button>
-  `;
-  L.marker([campus.Latitude, campus.Longitude])
-    .bindPopup(popupContent)
-    .addTo(map);
-});
-
-
 
 const campi = [
   { Marca: "FADERS", Campus: "CENTRO", Cidade: "Porto Alegre", Estado: "RS", Latitude: -30.0330658, Longitude: -51.2296474 },
@@ -151,6 +138,8 @@ const campi = [
   { Marca: "AGES", Campus: "PARIPIRANGA", Cidade: "Paripiranga", Estado: "BA", Latitude: -10.6865585, Longitude: -37.8609735 },
   { Marca: "AGES", Campus: "SENHOR DO BONFIM", Cidade: "Senhor Bonfim", Estado: "BA", Latitude: -10.4561676, Longitude: -40.1903311 }
 ];
+
+
   </script>
 </body>
 </html>
