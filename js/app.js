@@ -1,7 +1,8 @@
-
+// app.js
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
 import { getAuth, signInWithPopup, GoogleAuthProvider, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
-import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+import { getFirestore } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+import { campi } from "./campi.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCInOO9hKImhDPZeIYLY2aUKfyeAROpaMU",
@@ -38,7 +39,6 @@ logoutBtn.onclick = () => {
   });
 };
 
-// Inicializa o mapa
 const map = L.map("map").setView([-15.8, -47.9], 4);
 L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
   maxZoom: 18
@@ -49,16 +49,14 @@ campi.forEach(campus => {
     <strong>${campus.Marca}</strong><br>
     ${campus.Campus}<br>
     ${campus.Cidade} - ${campus.Estado}<br>
-    <button onclick="abrirPainel('${campus.Marca}', '${campus.Campus}')">Atualizar status</button>
+    <button onclick=\"abrirPainel('${campus.Marca}', '${campus.Campus}')\">Atualizar status</button>
   `;
   L.marker([campus.Latitude, campus.Longitude])
     .bindPopup(popupContent)
     .addTo(map);
 });
 
-
-// Aqui podemos buscar os dados do Firestore no futuro
-function abrirPainel(marca, campus) {
+export function abrirPainel(marca, campus) {
   document.getElementById("side-panel").classList.remove("hidden");
   document.getElementById("panel-title").innerText = `${marca} - ${campus}`;
   document.getElementById("campus-form").setAttribute("data-campus", `${marca}|${campus}`);
