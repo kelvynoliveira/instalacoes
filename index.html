@@ -12,32 +12,15 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js"></script>
 </head>
 <body>
-  
   <div class="dashboard">
     <div class="sidebar">
       <h2>Menu</h2>
-    
       <div class="user-section">
         <button id="login-btn">Login com Google</button>
         <button id="logout-btn" style="display:none;">Logout</button>
         <span id="user-info"></span>
       </div>
-    
-      <!-- Botão para colapsar/expandir a legenda -->
-      <button id="toggle-legend" class="legend-toggle-btn" aria-label="Mostrar/Ocultar Legenda"></button>
-
-    
-      <!-- Legenda com as cores dos estados -->
-      <div id="map-legend" class="info legend">
-        <div><i style="background:#d73027"></i> 0%</div>
-        <div><i style="background:#fc8d59"></i> 1% - 25%</div>
-        <div><i style="background:#fee08b"></i> 26% - 50%</div>
-        <div><i style="background:#d9ef8b"></i> 51% - 85%</div>
-        <div><i style="background:#91cf60"></i> 86% - 99%</div>
-        <div><i style="background:#1a9850"></i> 100%</div>
-      </div>
     </div>
-    
 
     <div class="main-content">
       <header class="topbar">
@@ -51,6 +34,15 @@
 
       <main>
         <div id="map"></div>
+        <div class="leaflet-control-custom-button" id="toggle-legend-btn" title="Mostrar/Ocultar Legenda"></div>
+        <div id="map-legend" class="info legend">
+          <div><i style="background:#d73027"></i> 0%</div>
+          <div><i style="background:#fc8d59"></i> 1% - 25%</div>
+          <div><i style="background:#fee08b"></i> 26% - 50%</div>
+          <div><i style="background:#d9ef8b"></i> 51% - 85%</div>
+          <div><i style="background:#91cf60"></i> 86% - 99%</div>
+          <div><i style="background:#1a9850"></i> 100%</div>
+        </div>
 
         <div id="side-panel" class="hidden">
           <h2 id="panel-title">Campus</h2>

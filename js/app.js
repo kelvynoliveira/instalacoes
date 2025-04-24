@@ -56,9 +56,12 @@ const tileDark = L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}
 const toggleLegendBtn = document.getElementById("toggle-legend");
 const mapLegend = document.getElementById("map-legend");
 
-toggleLegendBtn.addEventListener("click", () => {
-  mapLegend.classList.toggle("legend-collapsed");
-});
+if (toggleLegendBtn && mapLegend) {
+  toggleLegendBtn.addEventListener("click", () => {
+    mapLegend.classList.toggle("legend-collapsed");
+  });
+}
+
 
 // Aplica o tema salvo ou padrão
 const savedTheme = localStorage.getItem("theme") || "dark";
@@ -177,6 +180,16 @@ const progressoPorEstado = {
   "RN": 70,
   // Adicione mais siglas conforme quiser testar
 };
+
+// Botão de colapsar/expandir o menu lateral
+const menuToggleBtn = document.querySelector(".menu-toggle");
+const sidebar = document.querySelector(".sidebar");
+
+if (menuToggleBtn && sidebar) {
+  menuToggleBtn.addEventListener("click", () => {
+    sidebar.classList.toggle("collapsed");
+  });
+}
 let geojsonLayer; // precisa ficar fora do .then
 
 fetch("data/brazil-states.geojson")
