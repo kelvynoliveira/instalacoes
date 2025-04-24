@@ -226,6 +226,15 @@ main {
   overflow: hidden;
 }
 
+.info.legend i {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  margin-right: 8px;
+  border-radius: 3px;
+  vertical-align: middle;
+}
+
 .legend-collapsed {
   max-height: 0;
   padding: 0;
