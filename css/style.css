@@ -211,7 +211,9 @@ main {
 }
 
 .info.legend {
-  position: relative;
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
   background: var(--panel);
   color: var(--text);
   padding: 10px;
@@ -220,7 +222,6 @@ main {
   z-index: 999;
   box-shadow: 0 0 10px rgba(0,0,0,0.2);
   line-height: 1.8;
-  margin-top: 20px;
   transition: max-height 0.3s ease, padding 0.3s ease;
 }
 
@@ -241,14 +242,6 @@ main {
   flex-shrink: 0;
 }
 
-.sidebar .info.legend {
-  position: static;
-  bottom: auto;
-  right: auto;
-  max-width: 100%;
-  box-shadow: none;
-}
-
 .legend-collapsed {
   max-height: 0 !important;
   padding: 0 !important;
@@ -256,6 +249,9 @@ main {
 }
 
 .legend-toggle-btn {
+  position: absolute;
+  bottom: 100px;
+  right: 10px;
   background-color: var(--primary);
   color: white;
   border: none;
@@ -263,7 +259,7 @@ main {
   border-radius: 4px;
   cursor: pointer;
   font-size: 0.8em;
-  align-self: flex-start;
+  z-index: 1000;
 }
 
 @media (max-width: 768px) {
@@ -296,6 +292,7 @@ main {
   }
 
   .legend-toggle-btn {
-    align-self: flex-end;
+    bottom: 120px;
+    right: 10px;
   }
 }
