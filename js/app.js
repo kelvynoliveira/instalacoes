@@ -53,6 +53,12 @@ const tileDark = L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}
   subdomains: "abcd",
   maxZoom: 19
 });
+const toggleLegendBtn = document.getElementById("toggle-legend");
+const mapLegend = document.getElementById("map-legend");
+
+toggleLegendBtn.addEventListener("click", () => {
+  mapLegend.classList.toggle("legend-collapsed");
+});
 
 // Aplica o tema salvo ou padrão
 const savedTheme = localStorage.getItem("theme") || "dark";
