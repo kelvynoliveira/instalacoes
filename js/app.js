@@ -142,8 +142,19 @@ fetch("data/brazil-states.geojson")
   .then(geoData => {
     L.geoJSON(geoData, {
       style: feature => {
-        const sigla = feature.properties.sigla || feature.properties.UF; // tente 'sigla', se não, 'UF'
-        const progresso = progressoPorEstado[sigla] || 0;
+        const sigla = feature.properties.sigla || feature.properties.UF;
+        const progresso = progressoPorEstado[sigla];
+      
+        if (progresso === undefined) {
+          return {
+            fillColor: "transparent",
+            color: "#eee",       // borda mais clara ainda
+            dashArray: "2,4",    // borda tracejada opcional
+            weight: 0.5,         // borda mais fina
+            fillOpacity: 0
+          };
+        }
+              
         return {
           fillColor: getColor(progresso),
           color: "#333",
@@ -151,6 +162,7 @@ fetch("data/brazil-states.geojson")
           fillOpacity: 0.7
         };
       },
+      
       onEachFeature: (feature, layer) => {
         const sigla = feature.properties.sigla || feature.properties.UF;
         const progresso = progressoPorEstado[sigla] || 0;

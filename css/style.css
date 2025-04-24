@@ -89,3 +89,6 @@ body, html {
   color: #bbb;
   font-size: 0.85em;
 }
+.invalid {
+  border: 2px solid red !important;
+}
