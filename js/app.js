@@ -131,7 +131,7 @@ const progressoPorEstado = {
   "MG": 100,
   "SP": 75,
   "BA": 50,
-  "PE": 25,
+  "PE": 100,
   "GO": 10,
   "PA": 0,
   "SC": 5,
