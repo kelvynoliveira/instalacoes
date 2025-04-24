@@ -141,6 +141,22 @@ const progressoPorEstado = {
   "RN": 70,
   // Adicione mais siglas conforme quiser testar
 };
+
+// Alternância de tema claro/escuro
+const toggleBtn = document.getElementById("toggle-theme");
+toggleBtn.addEventListener("click", () => {
+  const currentTheme = document.documentElement.getAttribute("data-theme");
+  const newTheme = currentTheme === "dark" ? "light" : "dark";
+  document.documentElement.setAttribute("data-theme", newTheme);
+  localStorage.setItem("theme", newTheme); // salva a preferência
+});
+
+// Ao carregar, aplicar tema salvo
+const savedTheme = localStorage.getItem("theme");
+if (savedTheme) {
+  document.documentElement.setAttribute("data-theme", savedTheme);
+}
+
 let geojsonLayer; // precisa ficar fora do .then
 
 fetch("data/brazil-states.geojson")
