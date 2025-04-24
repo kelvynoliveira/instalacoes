@@ -49,11 +49,22 @@ campi.forEach(campus => {
     <strong>${campus.Marca}</strong><br>
     ${campus.Campus}<br>
     ${campus.Cidade} - ${campus.Estado}<br>
-    <button onclick=\"abrirPainel('${campus.Marca}', '${campus.Campus}')\">Atualizar status</button>
+    <button class="open-panel-btn" data-marca="${campus.Marca}" data-campus="${campus.Campus}">Atualizar status</button>
   `;
-  L.marker([campus.Latitude, campus.Longitude])
+
+  const marker = L.marker([campus.Latitude, campus.Longitude])
     .bindPopup(popupContent)
     .addTo(map);
+
+  marker.on("popupopen", (e) => {
+    const popupNode = e.popup.getElement();
+    const btn = popupNode.querySelector(".open-panel-btn");
+    if (btn) {
+      btn.addEventListener("click", () => {
+        abrirPainel(btn.dataset.marca, btn.dataset.campus);
+      });
+    }
+  });
 });
 
  function abrirPainel(marca, campus) {
