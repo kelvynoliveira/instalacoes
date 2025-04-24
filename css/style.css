@@ -110,3 +110,16 @@ body, html {
   opacity: 0.8;
   border-radius: 3px;
 }
+#toggle-theme {
+  margin-top: 10px;
+  background-color: var(--button);
+  color: #fff;
+  border: none;
+  padding: 8px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+#toggle-theme:hover {
+  background-color: var(--button-hover);
+}
+

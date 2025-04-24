@@ -40,9 +40,38 @@ logoutBtn.onclick = () => {
 };
 
 const map = L.map("map").setView([-15.8, -47.9], 4);
-L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-  maxZoom: 18
-}).addTo(map);
+
+// Tile layers para tema claro e escuro
+const tileLight = L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
+  attribution: '&copy; <a href="https://carto.com/">CARTO</a>',
+  subdomains: "abcd",
+  maxZoom: 19
+});
+
+const tileDark = L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
+  attribution: '&copy; <a href="https://carto.com/">CARTO</a>',
+  subdomains: "abcd",
+  maxZoom: 19
+});
+
+// Aplica o tema salvo ou padrão
+const savedTheme = localStorage.getItem("theme") || "dark";
+document.documentElement.setAttribute("data-theme", savedTheme);
+let currentTileLayer = savedTheme === "light" ? tileLight : tileDark;
+currentTileLayer.addTo(map);
+
+// Botão de alternância de tema
+const toggleBtn = document.getElementById("toggle-theme");
+toggleBtn.addEventListener("click", () => {
+  const currentTheme = document.documentElement.getAttribute("data-theme");
+  const newTheme = currentTheme === "dark" ? "light" : "dark";
+  document.documentElement.setAttribute("data-theme", newTheme);
+  localStorage.setItem("theme", newTheme);
+
+  map.removeLayer(currentTileLayer);
+  currentTileLayer = newTheme === "light" ? tileLight : tileDark;
+  currentTileLayer.addTo(map);
+});
 
 campi.forEach(campus => {
   const popupContent = `
