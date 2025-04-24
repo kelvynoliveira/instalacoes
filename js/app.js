@@ -63,7 +63,7 @@ currentTileLayer.addTo(map);
 // Botão de alternância de tema
 const toggleBtn = document.getElementById("toggle-theme");
 toggleBtn.addEventListener("click", () => {
-  const currentTheme = document.documentElement.getAttribute("data-theme");
+  const currentTheme = document.documentElement.getAttribute("data-theme") || "dark";
   const newTheme = currentTheme === "dark" ? "light" : "dark";
   document.documentElement.setAttribute("data-theme", newTheme);
   localStorage.setItem("theme", newTheme);
@@ -72,6 +72,7 @@ toggleBtn.addEventListener("click", () => {
   currentTileLayer = newTheme === "light" ? tileLight : tileDark;
   currentTileLayer.addTo(map);
 });
+
 
 campi.forEach(campus => {
   const popupContent = `
