@@ -145,6 +145,8 @@ main {
 #map {
   height: 100%;
   width: 100%;
+  position: relative;
+  z-index: 0;
 }
 
 #side-panel {
@@ -208,6 +210,28 @@ main {
   color: var(--text);
 }
 
+.info.legend {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  background: var(--panel);
+  color: var(--text);
+  padding: 10px;
+  border-radius: 8px;
+  font-size: 0.9em;
+  z-index: 999;
+  box-shadow: 0 0 10px rgba(0,0,0,0.2);
+}
+
+.info.legend i {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  margin-right: 6px;
+  vertical-align: middle;
+  border-radius: 2px;
+}
+
 @media (max-width: 768px) {
   .dashboard {
     flex-direction: column;
@@ -218,6 +242,7 @@ main {
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
+    padding: 10px 20px;
   }
 
   .main-content {
@@ -227,6 +252,13 @@ main {
   #side-panel {
     right: 10px;
     top: 10px;
-    width: 90%;
+    width: calc(100% - 20px);
+  }
+
+  .info.legend {
+    bottom: 10px;
+    right: 10px;
+    font-size: 0.8em;
+    padding: 8px;
   }
 }
