@@ -128,12 +128,12 @@ function getColor(percentual) {
   return '#1a9850'; // verde escuro
 }
 const progressoPorEstado = {
-  "MG": 100,
+  "MG": 0,
   "SP": 75,
   "BA": 50,
   "PE": 100,
   "GO": 10,
-  "PA": 0,
+  "PA": 98,
   "SC": 5,
   "RS": 25,
   "RJ": 0,
