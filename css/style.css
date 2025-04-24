@@ -250,7 +250,7 @@ main {
 
 .legend-toggle-btn {
   position: absolute;
-  bottom: 110px; /* Ajustado para não sobrepor a legenda */
+  bottom: 165px; /* Aumentado para não sobrepor o item 0% da legenda */
   right: 10px;
   background-color: var(--primary);
   color: white;
@@ -292,7 +292,7 @@ main {
   }
 
   .legend-toggle-btn {
-    bottom: 110px; /* Ajustado para não sobrepor a legenda em mobile */
+    bottom: 165px;
     right: 10px;
   }
 }
