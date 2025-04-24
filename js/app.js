@@ -230,30 +230,6 @@ fetch("data/brazil-states.geojson")
         });
       }
     }).addTo(map);
-    // Adiciona legenda no canto inferior direito
-const legenda = L.control({ position: "bottomright" });
-
-legenda.onAdd = function () {
-  const div = L.DomUtil.create("div", "info legend");
-  const grades = [0, 1, 26, 51, 86, 100];
-  const labels = [
-    "0%",
-    "1% - 25%",
-    "26% - 50%",
-    "51% - 85%",
-    "86% - 99%",
-    "100%"
-  ];
-
-  for (let i = 0; i < grades.length; i++) {
-    div.innerHTML += `
-      <i style="background:${getColor(grades[i])}"></i> ${labels[i]}<br>
-    `;
-  }
-  return div;
-};
-
-legenda.addTo(map);
 
   })
   .catch(error => console.error("Erro ao carregar GeoJSON:", error));
