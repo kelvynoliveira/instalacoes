@@ -56,7 +56,7 @@ campi.forEach(campus => {
     .addTo(map);
 });
 
-export function abrirPainel(marca, campus) {
+ function abrirPainel(marca, campus) {
   document.getElementById("side-panel").classList.remove("hidden");
   document.getElementById("panel-title").innerText = `${marca} - ${campus}`;
   document.getElementById("campus-form").setAttribute("data-campus", `${marca}|${campus}`);
@@ -64,3 +64,4 @@ export function abrirPainel(marca, campus) {
 document.getElementById("fechar-painel").addEventListener("click", () => {
   document.getElementById("side-panel").classList.add("hidden");
 });
+window.abrirPainel = abrirPainel;
