@@ -47,6 +47,7 @@ body, html {
   gap: 20px;
   transition: background-color 0.3s ease;
 }
+
 .sidebar h2 {
   font-size: 1.6em;
   font-weight: 700;
@@ -54,10 +55,22 @@ body, html {
   color: var(--primary);
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.4);
   position: relative;
-  padding-left: 8px;
+  padding-left: 12px;
   border-left: 4px solid var(--primary);
+  background: linear-gradient(90deg, var(--primary), transparent 70%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: glowText 3s ease-in-out infinite alternate;
 }
 
+@keyframes glowText {
+  from {
+    text-shadow: 0 0 5px var(--primary);
+  }
+  to {
+    text-shadow: 0 0 15px var(--primary);
+  }
+}
 
 .user-section button {
   background-color: var(--primary);
@@ -261,7 +274,7 @@ main {
 
 .legend-toggle-btn {
   position: absolute;
-  bottom: 170px;
+  bottom: 160px;
   right: 10px;
   background-color: var(--primary);
   color: white;
@@ -280,14 +293,9 @@ main {
 }
 
 .legend-toggle-btn::before {
-  content: "";
-  display: inline-block;
-  width: 18px;
-  height: 18px;
-  background: url('https://img.icons8.com/ios-filled/50/ffffff/visible.png') no-repeat center;
-  background-size: contain;
+  content: "\1F441";
+  font-size: 18px;
 }
-
 
 .legend-toggle-btn:hover {
   background-color: var(--primary-hover);
@@ -323,7 +331,7 @@ main {
   }
 
   .legend-toggle-btn {
-    bottom: 220px;
-    right: 14px;
+    bottom: 160px;
+    right: 10px;
   }
 }
