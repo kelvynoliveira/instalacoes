@@ -250,16 +250,31 @@ main {
 
 .legend-toggle-btn {
   position: absolute;
-  bottom: 165px; /* Aumentado para não sobrepor o item 0% da legenda */
+  bottom: 170px;
   right: 10px;
   background-color: var(--primary);
   color: white;
   border: none;
   padding: 6px 10px;
-  border-radius: 4px;
+  border-radius: 50%;
   cursor: pointer;
-  font-size: 0.8em;
+  font-size: 1em;
   z-index: 999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 36px;
+  height: 36px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.legend-toggle-btn::before {
+  content: "\1F441"; /* ícone de olho */
+  font-size: 18px;
+}
+
+.legend-toggle-btn:hover {
+  background-color: var(--primary-hover);
 }
 
 @media (max-width: 768px) {
@@ -292,7 +307,7 @@ main {
   }
 
   .legend-toggle-btn {
-    bottom: 165px;
+    bottom: 170px;
     right: 10px;
   }
 }
