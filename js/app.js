@@ -76,3 +76,45 @@ document.getElementById("fechar-painel").addEventListener("click", () => {
   document.getElementById("side-panel").classList.add("hidden");
 });
 window.abrirPainel = abrirPainel;
+
+document.getElementById("campus-form").addEventListener("submit", (e) => {
+  e.preventDefault();
+
+  const macField = document.getElementById("mac_address");
+  const mac = macField.value;
+
+  // Verifica se o MAC está com 17 caracteres (formato completo)
+  if (mac.length !== 17 || !/^([A-F0-9]{2}:){5}[A-F0-9]{2}$/.test(mac)) {
+    macField.classList.add("invalid");
+    alert("Por favor, insira um MAC Address válido no formato XX:XX:XX:XX:XX:XX.");
+    return;
+  }
+
+  macField.classList.remove("invalid");
+
+  // Aqui você continua com o salvamento no Firestore depois
+  alert("Validação OK! Pode salvar no Firebase aqui...");
+});
+
+
+const macInput = document.getElementById("mac_address");
+
+if (macInput) {
+  macInput.addEventListener("input", () => {
+    let value = macInput.value.toUpperCase().replace(/[^A-F0-9]/g, "");
+    value = value.substring(0, 12);
+
+    let formatted = "";
+    for (let i = 0; i < value.length; i += 2) {
+      if (i > 0) formatted += ":";
+      formatted += value.substring(i, i + 2);
+    }
+
+    macInput.value = formatted;
+
+    // Remove o estilo de erro em tempo real
+    if (formatted.length === 17 && /^([A-F0-9]{2}:){5}[A-F0-9]{2}$/.test(formatted)) {
+      macInput.classList.remove("invalid");
+    }
+  });
+}
