@@ -141,25 +141,26 @@ const progressoPorEstado = {
   "RN": 70,
   // Adicione mais siglas conforme quiser testar
 };
+let geojsonLayer; // precisa ficar fora do .then
 
 fetch("data/brazil-states.geojson")
   .then(response => response.json())
   .then(geoData => {
-    L.geoJSON(geoData, {
+    geojsonLayer = L.geoJSON(geoData, { // ✅ AQUI agora está correto
       style: feature => {
         const sigla = feature.properties.sigla || feature.properties.UF;
         const progresso = progressoPorEstado[sigla];
-      
+
         if (progresso === undefined) {
           return {
             fillColor: "transparent",
-            color: "#eee",       // borda mais clara ainda
-            dashArray: "2,4",    // borda tracejada opcional
-            weight: 0.5,         // borda mais fina
+            color: "#eee",
+            dashArray: "2,4",
+            weight: 0.5,
             fillOpacity: 0
           };
         }
-              
+
         return {
           fillColor: getColor(progresso),
           color: "#333",
@@ -167,39 +168,53 @@ fetch("data/brazil-states.geojson")
           fillOpacity: 0.7
         };
       },
-      
       onEachFeature: (feature, layer) => {
         const sigla = feature.properties.sigla || feature.properties.UF;
         const progresso = progressoPorEstado[sigla] || 0;
         const nome = feature.properties.nome || sigla;
+
         layer.bindPopup(`<strong>${nome}</strong><br>Progresso: ${progresso}%`);
+
+        // ✨ Zoom + destaque visual ao clicar
+        layer.on("click", () => {
+          map.fitBounds(layer.getBounds());
+          layer.setStyle({
+            weight: 3,
+            color: "#000",
+            dashArray: "",
+            fillOpacity: 0.9
+          });
+
+          setTimeout(() => {
+            geojsonLayer.resetStyle(layer); // ✅ isso agora funciona
+          }, 2000);
+        });
       }
     }).addTo(map);
-    // Adiciona legenda no canto inferior direito
-const legenda = L.control({ position: "bottomright" });
 
-legenda.onAdd = function () {
-  const div = L.DomUtil.create("div", "info legend");
-  const grades = [0, 1, 26, 51, 86, 100];
-  const labels = [
-    "0%",
-    "1% - 25%",
-    "26% - 50%",
-    "51% - 85%",
-    "86% - 99%",
-    "100%"
-  ];
+    // ✅ Legenda no canto inferior direito
+    const legenda = L.control({ position: "bottomright" });
 
-  for (let i = 0; i < grades.length; i++) {
-    div.innerHTML += `
-      <i style="background:${getColor(grades[i])}"></i> ${labels[i]}<br>
-    `;
-  }
-  return div;
-};
+    legenda.onAdd = function () {
+      const div = L.DomUtil.create("div", "info legend");
+      const grades = [0, 1, 26, 51, 86, 100];
+      const labels = [
+        "0%",
+        "1% - 25%",
+        "26% - 50%",
+        "51% - 85%",
+        "86% - 99%",
+        "100%"
+      ];
 
-legenda.addTo(map);
+      for (let i = 0; i < grades.length; i++) {
+        div.innerHTML += `
+          <i style="background:${getColor(grades[i])}"></i> ${labels[i]}<br>
+        `;
+      }
+      return div;
+    };
 
+    legenda.addTo(map);
   })
   .catch(error => console.error("Erro ao carregar GeoJSON:", error));
-
