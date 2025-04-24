@@ -76,7 +76,7 @@ export const campi = [
   { Marca: "UNA", Campus: "POUSO ALEGRE", Cidade: "Pouso Alegre", Estado: "MG", Latitude: -22.2304106, Longitude: -45.937238 },
   { Marca: "UNA", Campus: "SETE LAGOAS", Cidade: "Sete Lagoas", Estado: "MG", Latitude: -19.4677016, Longitude: -44.244788 },
   { Marca: "UNA", Campus: "UBERLÂNDIA - KARAÍBA", Cidade: "Uberlândia", Estado: "MG", Latitude: -18.936342, Longitude: -48.255128 },
-  { Marca: "UNA", Campus: "TUCURUÍ", Cidade: "Tucuruí", Estado: "PA", Latitude: -3.765722, Longitude: -49.677863 },
+  { Marca: "UNA", Campus: "TUCURUÍ", Cidade: "Tucuruí", Estado: "PA", Latitude: -3.765, Longitude: -49.678 },
   { Marca: "AGES", Campus: "IRECÊ", Cidade: "Irecê", Estado: "BA", Latitude: -11.3058751, Longitude: -41.8578131 },
   { Marca: "AGES", Campus: "JACOBINA", Cidade: "Jacobina", Estado: "BA", Latitude: -11.185858, Longitude: -40.5063328 },
   { Marca: "AGES", Campus: "PARIPIRANGA", Cidade: "Paripiranga", Estado: "BA", Latitude: -10.6865585, Longitude: -37.8609735 },
