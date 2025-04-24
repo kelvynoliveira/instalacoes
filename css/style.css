@@ -221,15 +221,29 @@ main {
   font-size: 0.9em;
   z-index: 999;
   box-shadow: 0 0 10px rgba(0,0,0,0.2);
+  max-width: 200px;
+  transition: max-height 0.3s ease, padding 0.3s ease;
+  overflow: hidden;
 }
 
-.info.legend i {
-  display: inline-block;
-  width: 14px;
-  height: 14px;
-  margin-right: 6px;
-  vertical-align: middle;
-  border-radius: 2px;
+.legend-collapsed {
+  max-height: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+.legend-toggle-btn {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  background-color: var(--primary);
+  color: white;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  z-index: 1000;
+  font-size: 0.8em;
 }
 
 @media (max-width: 768px) {
@@ -256,9 +270,14 @@ main {
   }
 
   .info.legend {
-    bottom: 10px;
+    bottom: 50px;
     right: 10px;
     font-size: 0.8em;
     padding: 8px;
+  }
+
+  .legend-toggle-btn {
+    bottom: 10px;
+    right: 10px;
   }
 }
