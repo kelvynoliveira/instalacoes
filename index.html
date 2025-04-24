@@ -14,7 +14,10 @@
 <body>
   <div class="dashboard">
     <div class="sidebar">
-      <h2>Menu</h2>
+      <button class="menu-toggle" title="Expandir/Colapsar Menu">
+        <i class="fas fa-bars"></i>
+      </button>
+      <h2 class="sidebar-title">Menu</h2>
       <div class="user-section">
         <button id="login-btn">Login com Google</button>
         <button id="logout-btn" style="display:none;">Logout</button>
@@ -34,7 +37,7 @@
 
       <main>
         <div id="map"></div>
-        <div class="leaflet-control-custom-button" id="toggle-legend-btn" title="Mostrar/Ocultar Legenda"></div>
+        <div id="toggle-legend-btn" class="legend-toggle-btn" title="Mostrar/Ocultar Legenda"></div>
         <div id="map-legend" class="info legend">
           <div><i style="background:#d73027"></i> 0%</div>
           <div><i style="background:#fc8d59"></i> 1% - 25%</div>
@@ -84,5 +87,6 @@
   </div>
 
   <script type="module" src="js/app.js"></script>
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 </body>
 </html>
