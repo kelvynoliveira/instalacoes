@@ -250,9 +250,8 @@ main {
 
 .legend-toggle-btn {
   position: absolute;
-  bottom: 100px;
+  bottom: 175px;
   right: 10px;
-  transform: translateY(60px);
   background-color: var(--primary);
   color: white;
   border: none;
@@ -293,7 +292,7 @@ main {
   }
 
   .legend-toggle-btn {
-    bottom: 110px;
+    bottom: 180px;
     right: 10px;
   }
 }
