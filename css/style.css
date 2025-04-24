@@ -27,8 +27,8 @@ body, html {
   font-family: Arial, sans-serif;
   background-color: var(--bg);
   color: var(--text);
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-rows: auto 1fr;
 }
 
 header {
@@ -64,6 +64,7 @@ header .theme-toggle {
   width: 40px;
   height: 40px;
   position: relative;
+  margin-left: auto;
 }
 
 header .theme-toggle .icon {
@@ -114,6 +115,13 @@ header .theme-toggle .moon {
   box-shadow: inset -5px -5px 0 0 #999;
 }
 
+main {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
 #map {
   flex-grow: 1;
   width: 100%;
@@ -122,8 +130,8 @@ header .theme-toggle .moon {
 
 #side-panel {
   position: absolute;
-  top: 60px;
-  right: 10px;
+  top: 70px;
+  right: 20px;
   width: 320px;
   background-color: var(--panel-bg);
   padding: 20px;

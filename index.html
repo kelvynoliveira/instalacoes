@@ -6,7 +6,6 @@
   <title>Mapa Interativo com Firebase</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <link rel="stylesheet" href="css/style.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js"></script>
@@ -14,9 +13,9 @@
 </head>
 <body>
   <header>
-    <div class="left" id="login-panel">
-      <button id="login-btn"><i class="fas fa-sign-in-alt"></i> Login com Google</button>
-      <button id="logout-btn" style="display:none;"><i class="fas fa-sign-out-alt"></i> Logout</button>
+    <div class="left">
+      <button id="login-btn">Login com Google</button>
+      <button id="logout-btn" style="display:none;">Logout</button>
       <span id="user-info"></span>
     </div>
     <div class="right">
@@ -29,43 +28,45 @@
     </div>
   </header>
 
-  <div id="map"></div>
+  <main>
+    <div id="map"></div>
 
-  <div id="side-panel" class="hidden">
-    <h2 id="panel-title">Campus</h2>
-    <form id="campus-form">
-      <label for="tipo">Tipo de equipamento</label>
-      <select id="tipo">
-        <option value="switch">Switch</option>
-        <option value="ap">Access Point</option>
-        <option value="nobreak">Nobreak</option>
-        <option value="filtro">Filtro de Linha</option>
-      </select>
+    <div id="side-panel" class="hidden">
+      <h2 id="panel-title">Campus</h2>
+      <form id="campus-form">
+        <label>Tipo de equipamento</label>
+        <select id="tipo">
+          <option value="switch">Switch</option>
+          <option value="ap">Access Point</option>
+          <option value="nobreak">Nobreak</option>
+          <option value="filtro">Filtro de Linha</option>
+        </select>
 
-      <label for="mac_address">MAC Address</label>
-      <input type="text" id="mac_address" maxlength="17" placeholder="00:00:00:00:00:00" required>
+        <label>MAC Address</label>
+        <input type="text" id="mac_address" maxlength="17" placeholder="00:00:00:00:00:00" required>
 
-      <label for="serial_number">Número de Série</label>
-      <input type="text" id="serial_number" placeholder="Ex: SN1234567890" required>
+        <label>Número de Série</label>
+        <input type="text" id="serial_number" placeholder="Ex: SN1234567890" required>
 
-      <label for="status">Status</label>
-      <select id="status">
-        <option value="aguardando">Aguardando entrega</option>
-        <option value="entregue">Entregue</option>
-        <option value="instalando">Em instalação</option>
-        <option value="instalado">Instalado</option>
-      </select>
+        <label>Status</label>
+        <select id="status">
+          <option value="aguardando">Aguardando entrega</option>
+          <option value="entregue">Entregue</option>
+          <option value="instalando">Em instalação</option>
+          <option value="instalado">Instalado</option>
+        </select>
 
-      <label for="data">Data de instalação</label>
-      <input type="date" id="data">
+        <label>Data de instalação</label>
+        <input type="date" id="data">
 
-      <label for="obs">Observações</label>
-      <textarea id="obs" placeholder="Ex: ficou no lugar do switch de numero de serie:"></textarea>
+        <label>Observações</label>
+        <textarea id="obs" placeholder="Ex: ficou no lugar do switch de numero de serie:"></textarea>
 
-      <button type="submit"><i class="fas fa-save"></i> Salvar</button>
-      <button type="button" id="fechar-painel"><i class="fas fa-times"></i> Fechar</button>
-    </form>
-  </div>
+        <button type="submit">Salvar</button>
+        <button type="button" id="fechar-painel">Fechar</button>
+      </form>
+    </div>
+  </main>
 
   <script type="module" src="js/app.js"></script>
 </body>
