@@ -252,7 +252,7 @@ main {
   position: absolute;
   bottom: 100px;
   right: 10px;
-  transform: translateY(-100%);
+  transform: translateY(60px);
   background-color: var(--primary);
   color: white;
   border: none;
