@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="pt-br" data-theme="dark">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Mapa Interativo com Firebase</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/style.css">
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js"></script>
@@ -13,10 +13,10 @@
 </head>
 <body>
   <div id="map"></div>
-
+  
   <div id="login-panel">
     <button id="login-btn">Login com Google</button>
-    <button id="logout-btn" style="display: none;">Logout</button>
+    <button id="logout-btn" style="display:none;">Logout</button>
     <span id="user-info"></span>
   </div>
 
@@ -30,35 +30,32 @@
         <option value="nobreak">Nobreak</option>
         <option value="filtro">Filtro de Linha</option>
       </select>
-    
-      <label>Número de série</label>
-      <input type="text" id="numero_serie" required>
-    
+
       <label>MAC Address</label>
-      <input type="text" id="mac_address" required>
-    
+      <input type="text" id="mac_address" maxlength="17" placeholder="00:00:00:00:00:00" required>
+
+      <label>Número de Série</label>
+      <input type="text" id="serial_number" placeholder="Ex: SN1234567890" required>
+
       <label>Status</label>
       <select id="status">
         <option value="aguardando">Aguardando entrega</option>
         <option value="entregue">Entregue</option>
         <option value="instalando">Em instalação</option>
         <option value="instalado">Instalado</option>
-        <option value="testado">Testado</option>
       </select>
-    
+
       <label>Data de instalação</label>
       <input type="date" id="data">
-    
+
       <label>Observações</label>
-      <textarea id="obs"></textarea>
-    
+      <textarea id="obs" placeholder="Ex: ficou no lugar do switch de numero de serie:"></textarea>
+
       <button type="submit">Salvar</button>
       <button type="button" id="fechar-painel">Fechar</button>
     </form>
-    
   </div>
 
-  <!-- Scripts -->
   <script type="module" src="js/app.js"></script>
 </body>
 </html>

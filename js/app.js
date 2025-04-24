@@ -118,3 +118,46 @@ if (macInput) {
     }
   });
 }
+
+function getColor(percentual) {
+  if (percentual === 0) return '#d73027'; // vermelho
+  if (percentual <= 25) return '#fc8d59'; // vermelho claro
+  if (percentual <= 50) return '#fee08b'; // laranja
+  if (percentual <= 85) return '#d9ef8b'; // amarelo
+  if (percentual <= 99) return '#91cf60'; // verde claro
+  return '#1a9850'; // verde escuro
+}
+const progressoPorEstado = {
+  "MG": 100,
+  "SP": 75,
+  "BA": 50,
+  "PE": 25,
+  "GO": 10,
+  "PA": 0,
+  // Adicione mais siglas conforme quiser testar
+};
+
+fetch("data/brazil-states.geojson")
+  .then(response => response.json())
+  .then(geoData => {
+    L.geoJSON(geoData, {
+      style: feature => {
+        const sigla = feature.properties.sigla || feature.properties.UF; // tente 'sigla', se não, 'UF'
+        const progresso = progressoPorEstado[sigla] || 0;
+        return {
+          fillColor: getColor(progresso),
+          color: "#333",
+          weight: 1,
+          fillOpacity: 0.7
+        };
+      },
+      onEachFeature: (feature, layer) => {
+        const sigla = feature.properties.sigla || feature.properties.UF;
+        const progresso = progressoPorEstado[sigla] || 0;
+        const nome = feature.properties.nome || sigla;
+        layer.bindPopup(`<strong>${nome}</strong><br>Progresso: ${progresso}%`);
+      }
+    }).addTo(map);
+  })
+  .catch(error => console.error("Erro ao carregar GeoJSON:", error));
+
