@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mapa Interativo com Firebase</title>
+  <title>Dashboard - Mapa Interativo</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <link rel="stylesheet" href="css/style.css">
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
@@ -12,22 +12,23 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js"></script>
 </head>
 <body>
-  <div id="map"></div>
-
-  <!-- login no canto superior esquerdo -->
-  <div id="login-panel">
-    <button id="login-btn">Login com Google</button>
-    <button id="logout-btn" style="display:none;">Logout</button>
-    <span id="user-info"></span>
-  </div>
-
-  <!-- botão de alternância de tema no canto superior direito -->
-  <button id="toggle-theme" class="theme-toggle" aria-label="Alternar tema">
-    <div class="icon">
-      <div class="sun"></div>
-      <div class="moon"></div>
+  <header>
+    <div class="left" id="login-panel">
+      <button id="login-btn">Login com Google</button>
+      <button id="logout-btn" style="display:none;">Logout</button>
+      <span id="user-info"></span>
     </div>
-  </button>
+    <div class="right">
+      <button id="toggle-theme" class="theme-toggle" aria-label="Alternar tema">
+        <div class="icon">
+          <div class="sun"></div>
+          <div class="moon"></div>
+        </div>
+      </button>
+    </div>
+  </header>
+
+  <div id="map"></div>
 
   <div id="side-panel" class="hidden">
     <h2 id="panel-title">Campus</h2>
