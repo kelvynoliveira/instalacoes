@@ -211,9 +211,7 @@ main {
 }
 
 .info.legend {
-  position: absolute;
-  bottom: 20px;
-  right: 20px;
+  position: relative;
   background: var(--panel);
   color: var(--text);
   padding: 10px;
@@ -221,16 +219,15 @@ main {
   font-size: 0.9em;
   z-index: 999;
   box-shadow: 0 0 10px rgba(0,0,0,0.2);
-  max-width: 220px;
-  transition: max-height 0.3s ease, padding 0.3s ease;
-  overflow: hidden;
   line-height: 1.8;
+  margin-top: 20px;
 }
 
 .info.legend div {
   display: flex;
   align-items: center;
   margin-bottom: 4px;
+  white-space: nowrap;
 }
 
 .info.legend i {
@@ -241,6 +238,14 @@ main {
   border-radius: 3px;
   vertical-align: middle;
   flex-shrink: 0;
+}
+
+.sidebar .info.legend {
+  position: static;
+  bottom: auto;
+  right: auto;
+  max-width: 100%;
+  box-shadow: none;
 }
 
 .legend-collapsed {
@@ -287,10 +292,9 @@ main {
   }
 
   .info.legend {
-    bottom: 50px;
-    right: 10px;
     font-size: 0.8em;
     padding: 8px;
+    margin-top: 10px;
   }
 
   .legend-toggle-btn {
