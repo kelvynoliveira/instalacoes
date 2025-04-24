@@ -134,6 +134,11 @@ const progressoPorEstado = {
   "PE": 25,
   "GO": 10,
   "PA": 0,
+  "SC": 5,
+  "RS": 25,
+  "RJ": 0,
+  "PB": 55,
+  "RN": 70,
   // Adicione mais siglas conforme quiser testar
 };
 
