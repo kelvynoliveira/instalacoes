@@ -269,9 +269,14 @@ main {
 }
 
 .legend-toggle-btn::before {
-  content: "\1F441"; /* ícone de olho */
-  font-size: 18px;
+  content: "";
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  background: url('https://img.icons8.com/ios-filled/50/ffffff/visible.png') no-repeat center;
+  background-size: contain;
 }
+
 
 .legend-toggle-btn:hover {
   background-color: var(--primary-hover);
@@ -307,7 +312,7 @@ main {
   }
 
   .legend-toggle-btn {
-    bottom: 170px;
-    right: 10px;
+    bottom: 220px;
+    right: 14px;
   }
 }
