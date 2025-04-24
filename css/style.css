@@ -221,9 +221,16 @@ main {
   font-size: 0.9em;
   z-index: 999;
   box-shadow: 0 0 10px rgba(0,0,0,0.2);
-  max-width: 200px;
+  max-width: 220px;
   transition: max-height 0.3s ease, padding 0.3s ease;
   overflow: hidden;
+  line-height: 1.8;
+}
+
+.info.legend div {
+  display: flex;
+  align-items: center;
+  margin-bottom: 4px;
 }
 
 .info.legend i {
@@ -233,6 +240,7 @@ main {
   margin-right: 8px;
   border-radius: 3px;
   vertical-align: middle;
+  flex-shrink: 0;
 }
 
 .legend-collapsed {
