@@ -133,7 +133,7 @@ document.getElementById("campus-form").addEventListener("submit", (e) => {
   macField.classList.remove("invalid");
 
   // Aqui você continua com o salvamento no Firestore depois
-  alert("Validação OK! Pode salvar no Firebase aqui...");
+  mostrarToast("Equipamento salvo com sucesso!");
 });
 
 
@@ -248,3 +248,17 @@ fetch("data/brazil-states.geojson")
   })
   .catch(error => console.error("Erro ao carregar GeoJSON:", error));
 
+  function mostrarToast(mensagem) {
+    const toast = document.getElementById("toast");
+    toast.textContent = mensagem;
+    toast.classList.remove("hidden");
+    toast.classList.add("show");
+  
+    setTimeout(() => {
+      toast.classList.remove("show");
+      setTimeout(() => {
+        toast.classList.add("hidden");
+      }, 400); // espera o fade-out antes de esconder
+    }, 3000); // Toast desaparece depois de 3 segundos
+  }
+  
