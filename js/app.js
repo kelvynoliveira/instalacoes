@@ -59,6 +59,7 @@ const mapLegend = document.getElementById("map-legend");
 if (toggleLegendBtn && mapLegend) {
   toggleLegendBtn.addEventListener("click", () => {
     mapLegend.classList.toggle("legend-collapsed");
+    toggleLegendBtn.classList.toggle("rotate");
   });
 }
 

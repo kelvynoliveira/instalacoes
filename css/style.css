@@ -246,7 +246,10 @@ main {
   z-index: 998;
   box-shadow: 0 0 10px rgba(0,0,0,0.2);
   line-height: 1.8;
-  transition: max-height 0.3s ease, padding 0.3s ease;
+  transition: max-height 0.4s ease, opacity 0.4s ease, padding 0.4s ease;
+  overflow: hidden;
+  max-height: 500px;
+  opacity: 1;
 }
 
 .info.legend div {
@@ -267,39 +270,46 @@ main {
 }
 
 .legend-collapsed {
-  max-height: 0 !important;
-  padding: 0 !important;
-  overflow: hidden !important;
+  max-height: 0;
+  padding: 0;
+  opacity: 0;
+  overflow: hidden;
 }
 
 .legend-toggle-btn {
   position: absolute;
-  bottom: 160px;
+  bottom: 180px;
   right: 10px;
   background-color: var(--primary);
   color: white;
   border: none;
-  padding: 6px 10px;
   border-radius: 50%;
+  width: 36px;
+  height: 36px;
   cursor: pointer;
-  font-size: 1em;
+  font-size: 1.2em;
   z-index: 999;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 36px;
-  height: 36px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  transition: transform 0.4s ease, background-color 0.3s;
 }
 
 .legend-toggle-btn::before {
-  content: "\1F441";
-  font-size: 18px;
+  content: "\f06e"; /* fa-eye (olho) do FontAwesome */
+  font-family: "Font Awesome 6 Free";
+  font-weight: 900;
+}
+
+.legend-toggle-btn.rotate {
+  transform: rotate(180deg);
 }
 
 .legend-toggle-btn:hover {
   background-color: var(--primary-hover);
 }
+
 
 @media (max-width: 768px) {
   .dashboard {
