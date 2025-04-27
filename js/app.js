@@ -126,9 +126,10 @@ document.getElementById("campus-form").addEventListener("submit", (e) => {
   // Verifica se o MAC está com 17 caracteres (formato completo)
   if (mac.length !== 17 || !/^([A-F0-9]{2}:){5}[A-F0-9]{2}$/.test(mac)) {
     macField.classList.add("invalid");
-    alert("Por favor, insira um MAC Address válido no formato XX:XX:XX:XX:XX:XX.");
+    mostrarToast("Por favor, insira um MAC Address válido!", "error");
     return;
   }
+  
 
   macField.classList.remove("invalid");
 
@@ -248,9 +249,17 @@ fetch("data/brazil-states.geojson")
   })
   .catch(error => console.error("Erro ao carregar GeoJSON:", error));
 
-  function mostrarToast(mensagem) {
+  function mostrarToast(mensagem, tipo = "success") {
     const toast = document.getElementById("toast");
     toast.textContent = mensagem;
+  
+    // Define a classe pela situação
+    if (tipo === "error") {
+      toast.classList.add("error-toast");
+    } else {
+      toast.classList.remove("error-toast");
+    }
+  
     toast.classList.remove("hidden");
     toast.classList.add("show");
   
@@ -258,7 +267,8 @@ fetch("data/brazil-states.geojson")
       toast.classList.remove("show");
       setTimeout(() => {
         toast.classList.add("hidden");
-      }, 400); // espera o fade-out antes de esconder
-    }, 3000); // Toast desaparece depois de 3 segundos
+        toast.classList.remove("error-toast"); // limpa para próximos toasts
+      }, 400);
+    }, 3000);
   }
   

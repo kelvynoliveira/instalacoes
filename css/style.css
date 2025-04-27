@@ -402,3 +402,7 @@ main {
 .toast.hidden {
   display: none;
 }
+
+.toast.error-toast {
+  background-color: #d32f2f; /* vermelho forte para erro */
+}
