@@ -95,8 +95,37 @@ toggleBtn.addEventListener("click", () => {
   currentTileLayer.addTo(map);
 });
 
+const logos = {
+  "ages": L.icon({ iconUrl: 'logos/ages.jpg', iconSize: [40, 40], iconAnchor: [20, 40], popupAnchor: [0, -40] }),
+  "una": L.icon({ iconUrl: 'logos/una.png', iconSize: [40, 40], iconAnchor: [20, 40], popupAnchor: [0, -40] }),
+  "unifg": L.icon({ iconUrl: 'logos/unifg.png', iconSize: [40, 40], iconAnchor: [20, 40], popupAnchor: [0, -40] }),
+  "fg": L.icon({ iconUrl: 'logos/fg.png', iconSize: [40, 40], iconAnchor: [20, 40], popupAnchor: [0, -40] }),
+  "fpb": L.icon({ iconUrl: 'logos/fpb.png', iconSize: [40, 40], iconAnchor: [20, 40], popupAnchor: [0, -40] }),
+  "unp": L.icon({ iconUrl: 'logos/unp.png', iconSize: [40, 40], iconAnchor: [20, 40], popupAnchor: [0, -40] }),
+  "uam": L.icon({ iconUrl: 'logos/uam.png', iconSize: [40, 40], iconAnchor: [20, 40], popupAnchor: [0, -40] }),
+  "unifacs": L.icon({ iconUrl: 'logos/unifacs.jpg', iconSize: [40, 40], iconAnchor: [20, 40], popupAnchor: [0, -40] }),
+  "ibmr": L.icon({ iconUrl: 'logos/ibmr.png', iconSize: [40, 40], iconAnchor: [20, 40], popupAnchor: [0, -40] }),
+  "faseh": L.icon({ iconUrl: 'logos/faseh.png', iconSize: [40, 40], iconAnchor: [20, 40], popupAnchor: [0, -40] }),
+  "unibh": L.icon({ iconUrl: 'logos/unibh.png', iconSize: [40, 40], iconAnchor: [20, 40], popupAnchor: [0, -40] }),
+  "unisociesc": L.icon({ iconUrl: 'logos/unisociesc.png', iconSize: [40, 40], iconAnchor: [20, 40], popupAnchor: [0, -40] }),
+  "unisul": L.icon({ iconUrl: 'logos/unisul.png', iconSize: [40, 40], iconAnchor: [20, 40], popupAnchor: [0, -40] }),
+  "unr": L.icon({ iconUrl: 'logos/unr.png', iconSize: [40, 40], iconAnchor: [20, 40], popupAnchor: [0, -40] }),
+  "usjt": L.icon({ iconUrl: 'logos/usjt.jpg', iconSize: [40, 40], iconAnchor: [20, 40], popupAnchor: [0, -40] }),
+};
+
+// Ícone padrão caso não tenha logo
+const defaultIcon = L.icon({
+  iconUrl: 'logos/default.png', // coloca uma imagem padrão, se quiser
+  iconSize: [30, 30],
+  iconAnchor: [15, 30],
+  popupAnchor: [0, -30]
+});
+
 
 campi.forEach(campus => {
+  const marcaKey = campus.Marca.toLowerCase(); // deixa o nome minúsculo para bater certinho
+  const icon = logos[marcaKey] || defaultIcon;
+
   const popupContent = `
     <strong>${campus.Marca}</strong><br>
     ${campus.Campus}<br>
@@ -104,7 +133,7 @@ campi.forEach(campus => {
     <button class="open-panel-btn" data-marca="${campus.Marca}" data-campus="${campus.Campus}">Atualizar status</button>
   `;
 
-  const marker = L.marker([campus.Latitude, campus.Longitude])
+  const marker = L.marker([campus.Latitude, campus.Longitude], { icon })
     .bindPopup(popupContent)
     .addTo(map);
 
