@@ -116,7 +116,7 @@ const logos = {
 
 // Ícone padrão caso não tenha logo
 const defaultIcon = L.icon({
-  iconUrl: 'logos/default.png', // coloca uma imagem padrão, se quiser
+  iconUrl: 'logos/anima.png', // coloca uma imagem padrão, se quiser
   iconSize: [30, 30],
   iconAnchor: [15, 30],
   popupAnchor: [0, -30]
