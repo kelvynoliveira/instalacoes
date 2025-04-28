@@ -4,6 +4,7 @@ import { getAuth, signInWithPopup, GoogleAuthProvider, signOut } from "https://w
 import { getFirestore } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 import { campi } from "./campi.js";
 
+// Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyCInOO9hKImhDPZeIYLY2aUKfyeAROpaMU",
   authDomain: "mapa---projeto.firebaseapp.com",
@@ -18,10 +19,14 @@ const auth = getAuth();
 const db = getFirestore(app);
 const provider = new GoogleAuthProvider();
 
+// Variáveis DOM
 const loginBtn = document.getElementById("login-btn");
 const logoutBtn = document.getElementById("logout-btn");
 const userInfo = document.getElementById("user-info");
+const toggleLegendBtn = document.getElementById("toggle-legend");
+const mapLegend = document.getElementById("map-legend");
 
+// Autenticação
 loginBtn.onclick = () => {
   signInWithPopup(auth, provider).then(result => {
     const user = result.user;
@@ -39,9 +44,10 @@ logoutBtn.onclick = () => {
   });
 };
 
+// Mapa
 const map = L.map("map").setView([-15.8, -47.9], 4);
 
-// Tile layers para tema claro e escuro
+// Tiles
 const tileLight = L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
   attribution: '&copy; <a href="https://carto.com/">CARTO</a>',
   subdomains: "abcd",
@@ -54,13 +60,13 @@ const tileDark = L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}
   maxZoom: 19
 });
 
-// Aplica o tema salvo ou padrão
+// Tema inicial
 const savedTheme = localStorage.getItem("theme") || "dark";
 document.documentElement.setAttribute("data-theme", savedTheme);
 let currentTileLayer = savedTheme === "light" ? tileLight : tileDark;
 currentTileLayer.addTo(map);
 
-// Botão de alternância de tema
+// Alternar tema
 const toggleBtn = document.getElementById("toggle-theme");
 toggleBtn.addEventListener("click", () => {
   const currentTheme = document.documentElement.getAttribute("data-theme") || "dark";
@@ -73,6 +79,15 @@ toggleBtn.addEventListener("click", () => {
   currentTileLayer.addTo(map);
 });
 
+// Alternar Legenda
+if (toggleLegendBtn && mapLegend) {
+  toggleLegendBtn.addEventListener("click", () => {
+    mapLegend.classList.toggle("legend-collapsed");
+    toggleLegendBtn.classList.toggle("rotate");
+  });
+}
+
+// Markers
 campi.forEach(campus => {
   const popupContent = `
     <strong>${campus.Marca}</strong><br>
@@ -96,21 +111,21 @@ campi.forEach(campus => {
   });
 });
 
+// Função abrir painel
 function abrirPainel(marca, campus) {
   document.getElementById("side-panel").classList.remove("hidden");
   document.getElementById("panel-title").innerText = `${marca} - ${campus}`;
   document.getElementById("campus-form").setAttribute("data-campus", `${marca}|${campus}`);
 }
 
-const fecharPainelBtn = document.getElementById("fechar-painel");
-fecharPainelBtn.addEventListener("click", () => {
+document.getElementById("fechar-painel").addEventListener("click", () => {
   document.getElementById("side-panel").classList.add("hidden");
 });
+window.abrirPainel = abrirPainel;
 
-const campusForm = document.getElementById("campus-form");
-campusForm.addEventListener("submit", (e) => {
+// Formulário
+document.getElementById("campus-form").addEventListener("submit", (e) => {
   e.preventDefault();
-
   const macField = document.getElementById("mac_address");
   const mac = macField.value;
 
@@ -121,28 +136,31 @@ campusForm.addEventListener("submit", (e) => {
   }
 
   macField.classList.remove("invalid");
-
   mostrarToast("Equipamento salvo com sucesso!");
 });
 
+// Formatar MAC
 const macInput = document.getElementById("mac_address");
-macInput.addEventListener("input", () => {
-  let value = macInput.value.toUpperCase().replace(/[^A-F0-9]/g, "");
-  value = value.substring(0, 12);
+if (macInput) {
+  macInput.addEventListener("input", () => {
+    let value = macInput.value.toUpperCase().replace(/[^A-F0-9]/g, "");
+    value = value.substring(0, 12);
 
-  let formatted = "";
-  for (let i = 0; i < value.length; i += 2) {
-    if (i > 0) formatted += ":";
-    formatted += value.substring(i, i + 2);
-  }
+    let formatted = "";
+    for (let i = 0; i < value.length; i += 2) {
+      if (i > 0) formatted += ":";
+      formatted += value.substring(i, i + 2);
+    }
 
-  macInput.value = formatted;
+    macInput.value = formatted;
 
-  if (formatted.length === 17 && /^([A-F0-9]{2}:){5}[A-F0-9]{2}$/.test(formatted)) {
-    macInput.classList.remove("invalid");
-  }
-});
+    if (formatted.length === 17 && /^([A-F0-9]{2}:){5}[A-F0-9]{2}$/.test(formatted)) {
+      macInput.classList.remove("invalid");
+    }
+  });
+}
 
+// Cores estados
 function getColor(percentual) {
   if (percentual === 0) return '#d73027';
   if (percentual <= 25) return '#fc8d59';
@@ -166,17 +184,17 @@ const progressoPorEstado = {
   "RN": 70,
 };
 
+// Botão Menu Sidebar
 const menuToggleBtn = document.querySelector(".menu-toggle");
 const sidebar = document.querySelector(".sidebar");
-
 if (menuToggleBtn && sidebar) {
   menuToggleBtn.addEventListener("click", () => {
     sidebar.classList.toggle("collapsed");
   });
 }
 
+// GeoJSON Estados
 let geojsonLayer;
-
 fetch("data/brazil-states.geojson")
   .then(response => response.json())
   .then(geoData => {
@@ -184,7 +202,7 @@ fetch("data/brazil-states.geojson")
       style: feature => {
         const sigla = feature.properties.sigla || feature.properties.UF;
         const progresso = progressoPorEstado[sigla];
-
+      
         if (progresso === undefined) {
           return {
             fillColor: "transparent",
@@ -194,7 +212,7 @@ fetch("data/brazil-states.geojson")
             fillOpacity: 0
           };
         }
-
+              
         return {
           fillColor: getColor(progresso),
           color: "#333",
@@ -206,9 +224,9 @@ fetch("data/brazil-states.geojson")
         const sigla = feature.properties.sigla || feature.properties.UF;
         const progresso = progressoPorEstado[sigla] || 0;
         const nome = feature.properties.nome || sigla;
-
+      
         layer.bindPopup(`<strong>${nome}</strong><br>Progresso: ${progresso}%`);
-
+      
         layer.on('click', () => {
           map.fitBounds(layer.getBounds());
           layer.setStyle({
@@ -217,7 +235,6 @@ fetch("data/brazil-states.geojson")
             dashArray: "",
             fillOpacity: 0.9
           });
-
           setTimeout(() => {
             geojsonLayer.resetStyle(layer);
           }, 2000);
@@ -227,13 +244,14 @@ fetch("data/brazil-states.geojson")
   })
   .catch(error => console.error("Erro ao carregar GeoJSON:", error));
 
+// Toast
 function mostrarToast(mensagem, tipo = "success") {
   const toast = document.getElementById("toast");
   const toastIcon = document.getElementById("toast-icon");
   const toastMessage = document.getElementById("toast-message");
 
   toastMessage.textContent = mensagem;
-
+  
   if (tipo === "error") {
     toast.classList.add("error-toast");
     toastIcon.textContent = "❌";
@@ -252,15 +270,4 @@ function mostrarToast(mensagem, tipo = "success") {
       toast.classList.remove("error-toast");
     }, 400);
   }, 3000);
-}
-
-// Controle da legenda
-const toggleLegendBtn = document.getElementById("toggle-legend");
-const mapLegend = document.getElementById("map-legend");
-
-if (toggleLegendBtn && mapLegend) {
-  toggleLegendBtn.addEventListener("click", () => {
-    mapLegend.classList.toggle("legend-collapsed");
-    toggleLegendBtn.classList.toggle("rotate");
-  });
 }
