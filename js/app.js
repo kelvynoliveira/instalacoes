@@ -83,7 +83,6 @@ let currentTileLayer = savedTheme === "light" ? tileLight : tileDark;
 currentTileLayer.addTo(map);
 
 // Botão de alternância de tema
-const toggleBtn = document.getElementById("toggle-theme");
 toggleBtn.addEventListener("click", () => {
   const currentTheme = document.documentElement.getAttribute("data-theme") || "dark";
   const newTheme = currentTheme === "dark" ? "light" : "dark";
@@ -93,6 +92,8 @@ toggleBtn.addEventListener("click", () => {
   map.removeLayer(currentTileLayer);
   currentTileLayer = newTheme === "light" ? tileLight : tileDark;
   currentTileLayer.addTo(map);
+
+  mostrarToast(newTheme === "dark" ? "Tema Escuro Ativado" : "Tema Claro Ativado");
 });
 
 
@@ -205,6 +206,18 @@ fetch("data/brazil-states.geojson")
   .finally(() => {
     spinner.classList.add("hidden"); // esconde o spinner
   });
+
+  const mapLoading = document.getElementById("map-loading");
+
+// Mostra o spinner enquanto o mapa carrega tiles
+map.on('loading', () => {
+  mapLoading.style.display = 'block';
+});
+
+// Esconde quando termina de carregar
+map.on('load', () => {
+  mapLoading.style.display = 'none';
+});
 
 // Botão de colapsar/expandir o menu lateral
 const menuToggleBtn = document.querySelector(".menu-toggle");
