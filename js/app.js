@@ -251,13 +251,17 @@ fetch("data/brazil-states.geojson")
 
   function mostrarToast(mensagem, tipo = "success") {
     const toast = document.getElementById("toast");
-    toast.textContent = mensagem;
+    const toastIcon = document.getElementById("toast-icon");
+    const toastMessage = document.getElementById("toast-message");
   
-    // Define a classe pela situação
+    toastMessage.textContent = mensagem;
+  
     if (tipo === "error") {
       toast.classList.add("error-toast");
+      toastIcon.textContent = "❌";
     } else {
       toast.classList.remove("error-toast");
+      toastIcon.textContent = "✔️";
     }
   
     toast.classList.remove("hidden");
@@ -267,8 +271,9 @@ fetch("data/brazil-states.geojson")
       toast.classList.remove("show");
       setTimeout(() => {
         toast.classList.add("hidden");
-        toast.classList.remove("error-toast"); // limpa para próximos toasts
+        toast.classList.remove("error-toast"); // limpa classe de erro
       }, 400);
     }, 3000);
   }
+  
   

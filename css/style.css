@@ -406,3 +406,13 @@ main {
 .toast.error-toast {
   background-color: #d32f2f; /* vermelho forte para erro */
 }
+
+#toast {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+#toast-icon {
+  font-size: 1.5em;
+}
