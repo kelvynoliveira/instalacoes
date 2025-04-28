@@ -272,27 +272,27 @@ fetch("data/brazil-states.geojson")
         const progresso = progressoPorEstado[sigla] || 0;
         const nome = feature.properties.nome || sigla;
       
-        layer.bindPopup(`<strong>${nome}</strong><br>Progresso: ${progresso}%`);
+        // Verifica se existe pelo menos 1 campus nesse estado
+        const temCampus = campi.some(campus => campus.Estado === sigla);
       
-        // Zoom + destaque ao clicar
+        if (temCampus) {
+          layer.bindPopup(`<strong>${nome}</strong><br>Progresso: ${progresso}%`);
+        }
+      
         layer.on('click', () => {
-          const currentTheme = document.documentElement.getAttribute("data-theme");
-          const borderColor = currentTheme === "dark" ? "#fff" : "#000"; // branco no escuro, preto no claro
-        
-          map.fitBounds(layer.getBounds()); // Dá zoom para o estado
+          map.fitBounds(layer.getBounds());
+      
           layer.setStyle({
             weight: 3,
-            color: borderColor,
+            color: document.documentElement.getAttribute('data-theme') === 'dark' ? '#fff' : '#000',
             dashArray: "",
             fillOpacity: 0.9
           });
-        
-          // Remove o destaque após 4 segundos
+      
           setTimeout(() => {
             geojsonLayer.resetStyle(layer);
           }, 4000);
         });
-        
       }
     }).addTo(map);
 
