@@ -111,7 +111,7 @@ const logos = {
   "unisul": L.icon({ iconUrl: 'logos/unisul.png', iconSize: [30, 30], iconAnchor: [15, 30], popupAnchor: [0, -30] }),
   "unr": L.icon({ iconUrl: 'logos/unr.png', iconSize: [30, 30], iconAnchor: [15, 30], popupAnchor: [0, -30] }),
   "usjt": L.icon({ iconUrl: 'logos/usjt.jpg', iconSize: [30, 30], iconAnchor: [15, 30], popupAnchor: [0, -30] }),
-  "fadergs": L.icon({ iconUrl: 'logos/fadergs.jpg', iconSize: [30, 30], iconAnchor: [15, 30], popupAnchor: [0, -30] }),
+  "faders": L.icon({ iconUrl: 'logos/fadergs.jpg', iconSize: [30, 30], iconAnchor: [15, 30], popupAnchor: [0, -30] }),
 };
 
 // Ícone padrão caso não tenha logo
