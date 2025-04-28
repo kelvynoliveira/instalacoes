@@ -128,11 +128,17 @@ campi.forEach(campus => {
   const icon = logos[marcaKey] || defaultIcon;
 
   const popupContent = `
-    <strong>${campus.Marca}</strong><br>
-    ${campus.Campus}<br>
-    ${campus.Cidade} - ${campus.Estado}<br>
-    <button class="open-panel-btn" data-marca="${campus.Marca}" data-campus="${campus.Campus}">Atualizar status</button>
-  `;
+  <strong>${campus.Marca}</strong><br>
+  ${campus.Campus}<br>
+  ${campus.Cidade} - ${campus.Estado}<br>
+  <button class="open-panel-btn" 
+          data-marca="${campus.Marca}" 
+          data-campus="${campus.Campus}" 
+          data-progresso="${campus.Progresso || 0}">
+    Atualizar status
+  </button>
+`;
+
 
   const marker = L.marker([campus.Latitude, campus.Longitude], { icon })
     .bindPopup(popupContent)
@@ -144,7 +150,7 @@ campi.forEach(campus => {
     const btn = popupNode.querySelector(".open-panel-btn");
     if (btn) {
       btn.addEventListener("click", () => {
-        abrirPainel(btn.dataset.marca, btn.dataset.campus);
+        abrirPainel(btn.dataset.marca, btn.dataset.campus, btn.dataset.progresso);
       });
     }
   });
@@ -152,11 +158,12 @@ campi.forEach(campus => {
 map.addLayer(markers);
 
 
- function abrirPainel(marca, campus) {
+function abrirPainel(marca, campus, progresso) {
   document.getElementById("side-panel").classList.remove("hidden");
-  document.getElementById("panel-title").innerText = `${marca} - ${campus}`;
+  document.getElementById("panel-title").innerText = `${marca} - ${campus} (${progresso}% concluído)`;
   document.getElementById("campus-form").setAttribute("data-campus", `${marca}|${campus}`);
 }
+
 document.getElementById("fechar-painel").addEventListener("click", () => {
   document.getElementById("side-panel").classList.add("hidden");
 });
