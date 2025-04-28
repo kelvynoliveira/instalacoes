@@ -128,10 +128,12 @@ body, html {
 }
 
 .theme-toggle .moon {
-  background: #f1f1f1;
+  background: radial-gradient(circle at 30% 30%, #ccc, #888 70%);
   transform: scale(0);
   opacity: 0;
+  box-shadow: inset -5px -5px 8px rgba(0, 0, 0, 0.5);
 }
+
 
 [data-theme="dark"] .sun {
   opacity: 0;
