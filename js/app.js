@@ -194,19 +194,7 @@ const progressoPorEstado = {
   "RN": 70,
   // Adicione mais siglas conforme quiser testar
 };
-const spinner = document.getElementById("spinner");
-spinner.classList.remove("hidden"); // mostra o spinner
 
-fetch("data/brazil-states.geojson")
-  .then(response => response.json())
-  .then(geoData => {
-    // carrega o mapa
-  })
-  .finally(() => {
-    spinner.classList.add("hidden"); // esconde o spinner
-  });
-
-  
 // Botão de colapsar/expandir o menu lateral
 const menuToggleBtn = document.querySelector(".menu-toggle");
 const sidebar = document.querySelector(".sidebar");
@@ -262,10 +250,10 @@ fetch("data/brazil-states.geojson")
             fillOpacity: 0.9
           });
       
-          // Remove o destaque após 4 segundos
+          // Remove o destaque após 2 segundos
           setTimeout(() => {
             geojsonLayer.resetStyle(layer);
-          }, 4000);
+          }, 2000);
         });
       }
     }).addTo(map);
@@ -297,7 +285,5 @@ fetch("data/brazil-states.geojson")
         toast.classList.add("hidden");
         toast.classList.remove("error-toast"); // limpa classe de erro
       }, 400);
-    }, 4000);
+    }, 3000);
   }
-  
-  
