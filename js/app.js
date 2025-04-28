@@ -225,6 +225,7 @@ const progressoPorEstado = {
   "RJ": 0,
   "PB": 55,
   "RN": 70,
+  "CE": 5,
   // Adicione mais siglas conforme quiser testar
 };
 
