@@ -252,10 +252,23 @@ main {
   z-index: 998;
   box-shadow: 0 0 10px rgba(0,0,0,0.2);
   line-height: 1.8;
-  transition: max-height 0.4s ease, opacity 0.4s ease, padding 0.4s ease;
+  transition: 
+    max-height 0.4s ease, 
+    opacity 0.4s ease, 
+    padding 0.4s ease,
+    transform 0.4s ease;
   overflow: hidden;
   max-height: 500px;
   opacity: 1;
+  transform: scale(1);
+}
+
+/* Quando colapsar */
+.info.legend.legend-collapsed {
+  max-height: 0;
+  padding: 0;
+  opacity: 0;
+  transform: scale(0.95);
 }
 
 .info.legend div {
@@ -421,4 +434,14 @@ main {
 
 #toast-icon {
   font-size: 1.5em;
+}
+
+.legend-toggle-btn::before {
+  content: "\f06e"; /* fa-eye */
+  font-family: "Font Awesome 6 Free";
+  font-weight: 900;
+}
+
+.legend-toggle-btn.hide-icon::before {
+  content: "\f070"; /* fa-eye-slash */
 }

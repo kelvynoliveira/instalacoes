@@ -58,8 +58,20 @@ const mapLegend = document.getElementById("map-legend");
 
 if (toggleLegendBtn && mapLegend) {
   toggleLegendBtn.addEventListener("click", () => {
-    mapLegend.classList.toggle("legend-collapsed");
-    toggleLegendBtn.classList.toggle("rotate");
+    if (mapLegend.classList.contains("legend-collapsed")) {
+      mapLegend.classList.remove("legend-collapsed");
+      toggleLegendBtn.classList.remove("hide-icon"); // remove classe de "olho cortado"
+      mapLegend.style.display = "block";
+    } else {
+      mapLegend.classList.add("legend-collapsed");
+      toggleLegendBtn.classList.add("hide-icon"); // adiciona classe de "olho cortado"
+
+      setTimeout(() => {
+        if (mapLegend.classList.contains("legend-collapsed")) {
+          mapLegend.style.display = "none";
+        }
+      }, 400);
+    }
   });
 }
 
