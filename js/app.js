@@ -242,19 +242,23 @@ fetch("data/brazil-states.geojson")
       
         // Zoom + destaque ao clicar
         layer.on('click', () => {
-          map.fitBounds(layer.getBounds()); // dá zoom para o estado
+          const currentTheme = document.documentElement.getAttribute("data-theme");
+          const borderColor = currentTheme === "dark" ? "#fff" : "#000"; // branco no escuro, preto no claro
+        
+          map.fitBounds(layer.getBounds()); // Dá zoom para o estado
           layer.setStyle({
             weight: 3,
-            color: "#000",
+            color: borderColor,
             dashArray: "",
             fillOpacity: 0.9
           });
-      
-          // Remove o destaque após 2 segundos
+        
+          // Remove o destaque após 4 segundos
           setTimeout(() => {
             geojsonLayer.resetStyle(layer);
-          }, 2000);
+          }, 4000);
         });
+        
       }
     }).addTo(map);
 
