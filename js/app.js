@@ -213,7 +213,7 @@ if (macInput) {
 }
 
 function getColor(percentual) {
-  if (percentual === 0) return '#d73027'; // vermelho
+  if (percentual <= 10) return '#d73027'; // vermelho
   if (percentual <= 25) return '#fc8d59'; // vermelho claro
   if (percentual <= 50) return '#fee08b'; // laranja
   if (percentual <= 85) return '#d9ef8b'; // amarelo
@@ -235,6 +235,15 @@ const progressoPorEstado = {
   "CE": 5,
   // Adicione mais siglas conforme quiser testar
 };
+// Novo: progresso individual por campus
+const progressoPorCampus = {
+  "AGES|IRECÊ": 75,
+  "UNA|BELO HORIZONTE": 40,
+  "UNIFG|RECIFE": 80,
+  "UAM|SÃO PAULO": 100,
+  // Adicione os outros campus aqui
+};
+
 
 // Botão de colapsar/expandir o menu lateral
 const menuToggleBtn = document.querySelector(".menu-toggle");
