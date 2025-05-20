@@ -122,6 +122,60 @@ const defaultIcon = L.icon({
   popupAnchor: [0, -30]
 });
 
+// Função para calcular progresso baseado nas metas e dados salvos no Firestore
+import { getDocs, collection } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+import { metas } from "./metas.js"; // objeto que você criou
+
+async function calcularProgresso(db) {
+  const equipamentosSnapshot = await getDocs(collection(db, "equipamentos"));
+
+  // Estrutura para contar equipamentos por marca > campus > tipo
+  const contagemAtual = {};
+
+  equipamentosSnapshot.forEach((doc) => {
+    const data = doc.data();
+    const [marca, campus] = (data.campus || "").split("|").map(e => e.trim());
+    const tipo = data.tipo;
+
+    if (!marca || !campus || !tipo) return;
+
+    if (!contagemAtual[marca]) contagemAtual[marca] = {};
+    if (!contagemAtual[marca][campus]) contagemAtual[marca][campus] = {};
+    if (!contagemAtual[marca][campus][tipo]) contagemAtual[marca][campus][tipo] = 0;
+
+    contagemAtual[marca][campus][tipo]++;
+  });
+
+  // Comparar com as metas e calcular progresso
+  const progressoPorCampus = {};
+
+  for (const marca in metas) {
+    for (const campus in metas[marca]) {
+      const metasCampus = metas[marca][campus];
+      const atuaisCampus = contagemAtual[marca]?.[campus] || {};
+
+      let totalTipos = 0;
+      let tiposConcluidos = 0;
+
+      for (const tipo in metasCampus) {
+        const meta = metasCampus[tipo];
+        const atual = atuaisCampus[tipo] || 0;
+        totalTipos++;
+
+        const percentual = Math.min(100, Math.round((atual / meta) * 100));
+        if (!progressoPorCampus[marca]) progressoPorCampus[marca] = {};
+        if (!progressoPorCampus[marca][campus]) progressoPorCampus[marca][campus] = {};
+
+        progressoPorCampus[marca][campus][tipo] = percentual;
+      }
+    }
+  }
+
+  return progressoPorCampus; // pode usar para exibir ou desenhar no mapa
+}
+
+export { calcularProgresso };
+
 
 campi.forEach(campus => {
   const marcaKey = campus.Marca.toLowerCase(); // deixa o nome minúsculo para bater certinho
@@ -220,30 +274,6 @@ function getColor(percentual) {
   if (percentual <= 99) return '#91cf60'; // verde claro
   return '#1a9850'; // verde escuro
 }
-const progressoPorEstado = {
-  "MG": 0,
-  "SP": 75,
-  "BA": 50,
-  "PE": 100,
-  "GO": 10,
-  "PA": 98,
-  "SC": 5,
-  "RS": 25,
-  "RJ": 0,
-  "PB": 55,
-  "RN": 70,
-  "CE": 5,
-  // Adicione mais siglas conforme quiser testar
-};
-// Novo: progresso individual por campus
-const progressoPorCampus = {
-  "AGES|IRECÊ": 75,
-  "UNA|BELO HORIZONTE": 40,
-  "UNIFG|RECIFE": 80,
-  "UAM|SÃO PAULO": 100,
-  // Adicione os outros campus aqui
-};
-
 
 // Botão de colapsar/expandir o menu lateral
 const menuToggleBtn = document.querySelector(".menu-toggle");
