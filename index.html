@@ -4,9 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dashboard Interativo - Firebase</title>
+  
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <link rel="stylesheet" href="css/style.css">
+
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js"></script>
@@ -16,7 +18,9 @@
   <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script> 
 </head>
 <body>
+
   <div class="dashboard">
+    
     <!-- Sidebar -->
     <div class="sidebar">
       <h2>Menu</h2>
@@ -26,8 +30,10 @@
         <span id="user-info"></span>
       </div>
     </div>
+
     <!-- Conteúdo Principal -->
-    <div class="main-content">    
+    <div class="main-content">
+      
       <header class="topbar">
         <button id="toggle-theme" class="theme-toggle" aria-label="Alternar tema">
           <div class="icon">
@@ -36,10 +42,13 @@
           </div>
         </button>
       </header>
+
       <main>
         <div id="map"></div>
+
         <!-- Botão flutuante de colapsar legenda -->
         <button id="toggle-legend" class="legend-toggle-btn" aria-label="Mostrar/Ocultar Legenda"></button>
+
         <!-- Legenda do mapa -->
         <div id="map-legend" class="info legend">
           <div><i style="background:#d73027"></i> 0%</div>
@@ -49,6 +58,7 @@
           <div><i style="background:#91cf60"></i> 86% - 99%</div>
           <div><i style="background:#1a9850"></i> 100%</div>
         </div>
+
         <!-- Painel Lateral de Cadastro -->
         <div id="side-panel" class="hidden">
           <h2 id="panel-title">Campus</h2>
@@ -58,31 +68,41 @@
               <option value="switch">Switch</option>
               <option value="nobreak">Nobreak</option>
             </select>
+
             <label>MAC Address</label>
             <input type="text" id="mac_address" maxlength="17" placeholder="00:00:00:00:00:00" required>
+
             <label>Número de Série</label>
             <input type="text" id="serial_number" placeholder="Ex: SN1234567890" required>
+
             <label>Status</label>
             <select id="status">
               <option value="aguardando">Aguardando entrega</option>
               <option value="entregue">Entregue</option>
               <option value="instalado">Instalado</option>
             </select>
+
             <label>Data de instalação</label>
             <input type="date" id="data">
+
             <label>Observações</label>
             <textarea id="obs" placeholder="Ex: ficou no lugar do switch de numero de serie:"></textarea>
+
             <button type="submit">Salvar</button>
             <button type="button" id="fechar-painel">Fechar</button>
           </form>
         </div>
+
       </main>
     </div>
+
   </div>
   <div id="toast" class="toast hidden">
     <span id="toast-icon"></span>
     <span id="toast-message"></span>
   </div>
+  
+
   <script type="module" src="js/app.js"></script>
 </body>
 </html>
