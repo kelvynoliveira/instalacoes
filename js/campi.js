@@ -80,5 +80,6 @@ export const campi = [
   { Marca: "AGES", Campus: "IRECÊ", Cidade: "Irecê", Estado: "BA", Latitude: -11.3058751, Longitude: -41.8578131 },
   { Marca: "AGES", Campus: "JACOBINA", Cidade: "Jacobina", Estado: "BA", Latitude: -11.185858, Longitude: -40.5063328 },
   { Marca: "AGES", Campus: "PARIPIRANGA", Cidade: "Paripiranga", Estado: "BA", Latitude: -10.6865585, Longitude: -37.8609735 },
+  { Marca: "HSM", Campus: "LEARNING VILLAGE", Cidade: "São Paulo", Estado: "SP", Latitude: -23.5981, Longitude: -46.6810 },
   { Marca: "AGES", Campus: "SENHOR DO BONFIM", Cidade: "Senhor Bonfim", Estado: "BA", Latitude: -10.4561676, Longitude: -40.1903311 }
 ];
