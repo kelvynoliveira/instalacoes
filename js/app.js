@@ -161,14 +161,14 @@ document.getElementById("fechar-painel").addEventListener("click", () => {
 const macInput = document.getElementById("mac_address");
 if (macInput) {
   macInput.addEventListener("input", () => {
-    let value = macInput.value.toUpperCase().replace(/[^A-Z0-9]/g, "").substring(0, 12);
+    let value = macInput.value.toUpperCase().replace(/[^A-F0-9]/g, "").substring(0, 12);
     let formatted = "";
     for (let i = 0; i < value.length; i += 2) {
       if (i > 0) formatted += ":";
       formatted += value.substring(i, i + 2);
     }
     macInput.value = formatted;
-    if (formatted.length === 17 && /^([A-Z0-9]{2}:){5}[A-Z0-9]{2}$/.test(formatted)) {
+    if (formatted.length === 17 && /^([A-F0-9]{2}:){5}[A-F0-9]{2}$/.test(formatted)) {
       macInput.classList.remove("invalid");
     }
   });
@@ -196,7 +196,7 @@ document.getElementById("campus-form").addEventListener("submit", async (e) => {
   const dataInstalacao = document.getElementById("data").value;
   const observacoes = document.getElementById("obs").value.trim();
 
-  if (mac.length !== 17 || !/^([A-Z0-9]{2}:){5}[A-Z0-9]{2}$/.test(mac)) {
+  if (mac.length !== 17 || !/^([A-F0-9]{2}:){5}[A-F0-9]{2}$/.test(mac)) {
     document.getElementById("mac_address").classList.add("invalid");
     mostrarToast("Por favor, insira um MAC Address válido!", "error");
     return;
