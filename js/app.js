@@ -321,3 +321,4 @@ calcularProgresso().then(progressoPorEstado => {
     })
     .catch(error => console.error("Erro ao carregar GeoJSON:", error));
 });
+
