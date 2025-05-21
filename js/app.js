@@ -183,6 +183,7 @@ async function calcularProgresso() {
   });
 
   const progressoPorEstado = {};
+
   for (const marca in metas) {
     for (const campus in metas[marca]) {
       const metasCampus = metas[marca][campus];
@@ -200,15 +201,23 @@ async function calcularProgresso() {
 
       const campusInfo = campi.find(c => c.Marca === marca && c.Campus === campus);
       if (campusInfo) {
-        const percentual = Math.min(100, Math.round((totalAtual / totalMeta) * 100));
-        progressoPorEstado[campusInfo.Estado] ??= 0;
-        progressoPorEstado[campusInfo.Estado] += percentual;
+        const percentual = totalMeta === 0 ? 0 : Math.round((totalAtual / totalMeta) * 100);
+        progressoPorEstado[campusInfo.Estado] ??= [];
+        progressoPorEstado[campusInfo.Estado].push(percentual);
       }
     }
   }
 
-  return progressoPorEstado;
+  const progressoFinalPorEstado = {};
+  for (const estado in progressoPorEstado) {
+    const valores = progressoPorEstado[estado];
+    const media = Math.round(valores.reduce((a, b) => a + b, 0) / valores.length);
+    progressoFinalPorEstado[estado] = media;
+  }
+
+  return progressoFinalPorEstado;
 }
+
 
 calcularProgresso().then(progressoPorEstado => {
   fetch("data/brazil-states.geojson")
