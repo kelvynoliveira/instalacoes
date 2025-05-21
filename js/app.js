@@ -238,7 +238,7 @@ async function calcularProgresso() {
 
   equipamentosSnapshot.forEach((doc) => {
     const data = doc.data();
-    const [marca, campus] = (data.campus || "").split("|").map(e => e.trim());
+    const [marca, campus] = (data.campus || "").split("|").map(e => e.trim().toUpperCase());
     const tipo = (data.tipo || "").toLowerCase();
 
     if (!marca || !campus || !tipo) return;
@@ -255,7 +255,7 @@ async function calcularProgresso() {
   for (const marca in metas) {
     for (const campus in metas[marca]) {
       const metasCampus = metas[marca][campus];
-      const atuaisCampus = contagemAtual[marca]?.[campus] || {};
+      const atuaisCampus = contagemAtual[marca.toUpperCase()]?.[campus.toUpperCase()] || {};
 
       let totalMeta = 0;
       let totalAtual = 0;
@@ -267,13 +267,18 @@ async function calcularProgresso() {
         totalAtual += atual;
       }
 
-      const campusInfo = campi.find(c => c.Marca === marca && c.Campus === campus);
+      const campusInfo = campi.find(c => 
+        c.Marca.trim().toUpperCase() === marca.trim().toUpperCase() && 
+        c.Campus.trim().toUpperCase() === campus.trim().toUpperCase()
+      );
+
       if (campusInfo) {
+        const estado = campusInfo.Estado.trim().toUpperCase();
         const percentual = totalMeta === 0 ? 0 : Math.round((totalAtual / totalMeta) * 100);
-        progressoSoma[campusInfo.Estado] ??= 0;
-        progressoCount[campusInfo.Estado] ??= 0;
-        progressoSoma[campusInfo.Estado] += percentual;
-        progressoCount[campusInfo.Estado]++;
+        progressoSoma[estado] ??= 0;
+        progressoCount[estado] ??= 0;
+        progressoSoma[estado] += percentual;
+        progressoCount[estado]++;
       }
     }
   }
@@ -293,7 +298,7 @@ calcularProgresso().then(progressoPorEstado => {
     .then(geoData => {
       L.geoJSON(geoData, {
         style: feature => {
-          const sigla = feature.properties.sigla || feature.properties.UF;
+          const sigla = (feature.properties.sigla || feature.properties.UF).trim().toUpperCase();
           const progresso = progressoPorEstado[sigla];
 
           if (progresso === undefined) {
@@ -314,11 +319,11 @@ calcularProgresso().then(progressoPorEstado => {
           };
         },
         onEachFeature: (feature, layer) => {
-          const sigla = feature.properties.sigla || feature.properties.UF;
+          const sigla = (feature.properties.sigla || feature.properties.UF).trim().toUpperCase();
           const progresso = progressoPorEstado[sigla] || 0;
           const nome = feature.properties.nome || sigla;
 
-          const temCampus = campi.some(campus => campus.Estado === sigla);
+          const temCampus = campi.some(campus => campus.Estado.trim().toUpperCase() === sigla);
           if (temCampus) {
             layer.bindPopup(`<strong>${nome}</strong><br>Progresso: ${progresso}%`);
           }
