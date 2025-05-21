@@ -1,8 +1,9 @@
 // app.js
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
 import { getAuth, signInWithPopup, GoogleAuthProvider, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
-import { getFirestore } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+import { getFirestore, getDocs, collection } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 import { campi } from "./campi.js";
+import { metas } from "./metas.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCInOO9hKImhDPZeIYLY2aUKfyeAROpaMU",
@@ -41,7 +42,6 @@ logoutBtn.onclick = () => {
 
 const map = L.map("map").setView([-15.8, -47.9], 4);
 
-// Tile layers para tema claro e escuro
 const tileLight = L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
   attribution: '&copy; <a href="https://carto.com/">CARTO</a>',
   subdomains: "abcd",
@@ -53,38 +53,13 @@ const tileDark = L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}
   subdomains: "abcd",
   maxZoom: 19
 });
-const toggleLegendBtn = document.getElementById("toggle-legend");
-const mapLegend = document.getElementById("map-legend");
 
-if (toggleLegendBtn && mapLegend) {
-  toggleLegendBtn.addEventListener("click", () => {
-    if (mapLegend.classList.contains("legend-collapsed")) {
-      mapLegend.classList.remove("legend-collapsed");
-      toggleLegendBtn.classList.remove("hide-icon"); // remove classe de "olho cortado"
-      mapLegend.style.display = "block";
-    } else {
-      mapLegend.classList.add("legend-collapsed");
-      toggleLegendBtn.classList.add("hide-icon"); // adiciona classe de "olho cortado"
-
-      setTimeout(() => {
-        if (mapLegend.classList.contains("legend-collapsed")) {
-          mapLegend.style.display = "none";
-        }
-      }, 400);
-    }
-  });
-}
-
-
-// Aplica o tema salvo ou padrão
 const savedTheme = localStorage.getItem("theme") || "dark";
 document.documentElement.setAttribute("data-theme", savedTheme);
 let currentTileLayer = savedTheme === "light" ? tileLight : tileDark;
 currentTileLayer.addTo(map);
 
-// Botão de alternância de tema
-const toggleBtn = document.getElementById("toggle-theme");
-toggleBtn.addEventListener("click", () => {
+document.getElementById("toggle-theme").addEventListener("click", () => {
   const currentTheme = document.documentElement.getAttribute("data-theme") || "dark";
   const newTheme = currentTheme === "dark" ? "light" : "dark";
   document.documentElement.setAttribute("data-theme", newTheme);
@@ -94,110 +69,70 @@ toggleBtn.addEventListener("click", () => {
   currentTileLayer = newTheme === "light" ? tileLight : tileDark;
   currentTileLayer.addTo(map);
 });
-const markers = L.markerClusterGroup();
+
+const toggleLegendBtn = document.getElementById("toggle-legend");
+const mapLegend = document.getElementById("map-legend");
+
+if (toggleLegendBtn && mapLegend) {
+  toggleLegendBtn.addEventListener("click", () => {
+    mapLegend.classList.toggle("legend-collapsed");
+    toggleLegendBtn.classList.toggle("hide-icon");
+  });
+}
+
 const logos = {
-  "ages": L.icon({ iconUrl: 'logos/ages.jpg', iconSize: [30, 30], iconAnchor: [15, 30], popupAnchor: [0, -30] }),
-  "una": L.icon({ iconUrl: 'logos/una.png', iconSize: [30, 30], iconAnchor: [15, 30], popupAnchor: [0, -30] }),
-  "unifg": L.icon({ iconUrl: 'logos/unifg.png', iconSize: [30, 30], iconAnchor: [15, 30], popupAnchor: [0, -30] }),
-  "fg": L.icon({ iconUrl: 'logos/fg.png', iconSize: [30, 30], iconAnchor: [15, 30], popupAnchor: [0, -30] }),
-  "fpb": L.icon({ iconUrl: 'logos/fpb.png', iconSize: [30, 30], iconAnchor: [15, 30], popupAnchor: [0, -30] }),
-  "unp": L.icon({ iconUrl: 'logos/unp.png', iconSize: [30, 30], iconAnchor: [15, 30], popupAnchor: [0, -30] }),
-  "uam": L.icon({ iconUrl: 'logos/uam.png', iconSize: [30, 30], iconAnchor: [15, 30], popupAnchor: [0, -30] }),
-  "unifacs": L.icon({ iconUrl: 'logos/unifacs.jpg', iconSize: [30, 30], iconAnchor: [15, 30], popupAnchor: [0, -30] }),
-  "ibmr": L.icon({ iconUrl: 'logos/ibmr.png', iconSize: [30, 30], iconAnchor: [15, 30], popupAnchor: [0, -30] }),
-  "faseh": L.icon({ iconUrl: 'logos/faseh.png', iconSize: [30, 30], iconAnchor: [15, 30], popupAnchor: [0, -30] }),
-  "unibh": L.icon({ iconUrl: 'logos/unibh.png', iconSize: [30, 30], iconAnchor: [15, 30], popupAnchor: [0, -30] }),
-  "unisociesc": L.icon({ iconUrl: 'logos/unisociesc.png', iconSize: [30, 30], iconAnchor: [15, 30], popupAnchor: [0, -30] }),
-  "unisul": L.icon({ iconUrl: 'logos/unisul.png', iconSize: [30, 30], iconAnchor: [15, 30], popupAnchor: [0, -30] }),
-  "unr": L.icon({ iconUrl: 'logos/unr.png', iconSize: [30, 30], iconAnchor: [15, 30], popupAnchor: [0, -30] }),
-  "usjt": L.icon({ iconUrl: 'logos/usjt.jpg', iconSize: [30, 30], iconAnchor: [15, 30], popupAnchor: [0, -30] }),
-  "faders": L.icon({ iconUrl: 'logos/fadergs.png', iconSize: [30, 30], iconAnchor: [15, 30], popupAnchor: [0, -30] }),
+  "ages": "logos/ages.jpg",
+  "una": "logos/una.png",
+  "unifg": "logos/unifg.png",
+  "fg": "logos/fg.png",
+  "fpb": "logos/fpb.png",
+  "unp": "logos/unp.png",
+  "uam": "logos/uam.png",
+  "unifacs": "logos/unifacs.jpg",
+  "ibmr": "logos/ibmr.png",
+  "faseh": "logos/faseh.png",
+  "unibh": "logos/unibh.png",
+  "unisociesc": "logos/unisociesc.png",
+  "unisul": "logos/unisul.png",
+  "unr": "logos/unr.png",
+  "usjt": "logos/usjt.jpg",
+  "faders": "logos/fadergs.png"
 };
 
-// Ícone padrão caso não tenha logo
 const defaultIcon = L.icon({
-  iconUrl: 'logos/anima.png', // coloca uma imagem padrão, se quiser
+  iconUrl: 'logos/anima.png',
   iconSize: [30, 30],
   iconAnchor: [15, 30],
   popupAnchor: [0, -30]
 });
 
-// Função para calcular progresso baseado nas metas e dados salvos no Firestore
-import { getDocs, collection } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
-import { metas } from "./metas.js"; // objeto que você criou
-
-async function calcularProgresso(db) {
-  const equipamentosSnapshot = await getDocs(collection(db, "equipamentos"));
-
-  // Estrutura para contar equipamentos por marca > campus > tipo
-  const contagemAtual = {};
-
-  equipamentosSnapshot.forEach((doc) => {
-    const data = doc.data();
-    const [marca, campus] = (data.campus || "").split("|").map(e => e.trim());
-    const tipo = data.tipo;
-
-    if (!marca || !campus || !tipo) return;
-
-    if (!contagemAtual[marca]) contagemAtual[marca] = {};
-    if (!contagemAtual[marca][campus]) contagemAtual[marca][campus] = {};
-    if (!contagemAtual[marca][campus][tipo]) contagemAtual[marca][campus][tipo] = 0;
-
-    contagemAtual[marca][campus][tipo]++;
-  });
-
-  // Comparar com as metas e calcular progresso
-  const progressoPorCampus = {};
-
-  for (const marca in metas) {
-    for (const campus in metas[marca]) {
-      const metasCampus = metas[marca][campus];
-      const atuaisCampus = contagemAtual[marca]?.[campus] || {};
-
-      let totalTipos = 0;
-      let tiposConcluidos = 0;
-
-      for (const tipo in metasCampus) {
-        const meta = metasCampus[tipo];
-        const atual = atuaisCampus[tipo] || 0;
-        totalTipos++;
-
-        const percentual = Math.min(100, Math.round((atual / meta) * 100));
-        if (!progressoPorCampus[marca]) progressoPorCampus[marca] = {};
-        if (!progressoPorCampus[marca][campus]) progressoPorCampus[marca][campus] = {};
-
-        progressoPorCampus[marca][campus][tipo] = percentual;
-      }
-    }
-  }
-
-  return progressoPorCampus; // pode usar para exibir ou desenhar no mapa
-}
-
-export { calcularProgresso };
-
+const markers = L.markerClusterGroup();
 
 campi.forEach(campus => {
-  const marcaKey = campus.Marca.toLowerCase(); // deixa o nome minúsculo para bater certinho
-  const icon = logos[marcaKey] || defaultIcon;
+  const marcaKey = campus.Marca.toLowerCase();
+  const icon = L.icon({
+    iconUrl: logos[marcaKey] || 'logos/anima.png',
+    iconSize: [30, 30],
+    iconAnchor: [15, 30],
+    popupAnchor: [0, -30]
+  });
 
   const popupContent = `
-  <strong>${campus.Marca}</strong><br>
-  ${campus.Campus}<br>
-  ${campus.Cidade} - ${campus.Estado}<br>
-  <button class="open-panel-btn" 
-          data-marca="${campus.Marca}" 
-          data-campus="${campus.Campus}" 
-          data-progresso="${campus.Progresso || 0}">
-    Atualizar status
-  </button>
-`;
-
+    <strong>${campus.Marca}</strong><br>
+    ${campus.Campus}<br>
+    ${campus.Cidade} - ${campus.Estado}<br>
+    <button class="open-panel-btn" 
+            data-marca="${campus.Marca}" 
+            data-campus="${campus.Campus}" 
+            data-progresso="0">
+      Atualizar status
+    </button>
+  `;
 
   const marker = L.marker([campus.Latitude, campus.Longitude], { icon })
-    .bindPopup(popupContent)
-    markers.addLayer(marker);
+    .bindPopup(popupContent);
 
+  markers.addLayer(marker);
 
   marker.on("popupopen", (e) => {
     const popupNode = e.popup.getElement();
@@ -209,8 +144,8 @@ campi.forEach(campus => {
     }
   });
 });
-map.addLayer(markers);
 
+map.addLayer(markers);
 
 function abrirPainel(marca, campus, progresso) {
   document.getElementById("side-panel").classList.remove("hidden");
@@ -221,153 +156,110 @@ function abrirPainel(marca, campus, progresso) {
 document.getElementById("fechar-painel").addEventListener("click", () => {
   document.getElementById("side-panel").classList.add("hidden");
 });
-window.abrirPainel = abrirPainel;
-
-document.getElementById("campus-form").addEventListener("submit", (e) => {
-  e.preventDefault();
-
-  const macField = document.getElementById("mac_address");
-  const mac = macField.value;
-
-  // Verifica se o MAC está com 17 caracteres (formato completo)
-  if (mac.length !== 17 || !/^([A-F0-9]{2}:){5}[A-F0-9]{2}$/.test(mac)) {
-    macField.classList.add("invalid");
-    mostrarToast("Por favor, insira um MAC Address válido!", "error");
-    return;
-  }
-  
-
-  macField.classList.remove("invalid");
-
-  // Aqui você continua com o salvamento no Firestore depois
-  mostrarToast("Equipamento salvo com sucesso!");
-});
-
-
-const macInput = document.getElementById("mac_address");
-
-if (macInput) {
-  macInput.addEventListener("input", () => {
-    let value = macInput.value.toUpperCase().replace(/[^A-F0-9]/g, "");
-    value = value.substring(0, 12);
-
-    let formatted = "";
-    for (let i = 0; i < value.length; i += 2) {
-      if (i > 0) formatted += ":";
-      formatted += value.substring(i, i + 2);
-    }
-
-    macInput.value = formatted;
-
-    // Remove o estilo de erro em tempo real
-    if (formatted.length === 17 && /^([A-F0-9]{2}:){5}[A-F0-9]{2}$/.test(formatted)) {
-      macInput.classList.remove("invalid");
-    }
-  });
-}
 
 function getColor(percentual) {
-  if (percentual <= 10) return '#d73027'; // vermelho
-  if (percentual <= 25) return '#fc8d59'; // vermelho claro
-  if (percentual <= 50) return '#fee08b'; // laranja
-  if (percentual <= 85) return '#d9ef8b'; // amarelo
-  if (percentual <= 99) return '#91cf60'; // verde claro
-  return '#1a9850'; // verde escuro
+  if (percentual <= 10) return '#d73027';
+  if (percentual <= 25) return '#fc8d59';
+  if (percentual <= 50) return '#fee08b';
+  if (percentual <= 85) return '#d9ef8b';
+  if (percentual <= 99) return '#91cf60';
+  return '#1a9850';
 }
 
-// Botão de colapsar/expandir o menu lateral
-const menuToggleBtn = document.querySelector(".menu-toggle");
-const sidebar = document.querySelector(".sidebar");
+async function calcularProgresso() {
+  const equipamentosSnapshot = await getDocs(collection(db, "equipamentos"));
+  const contagemAtual = {};
 
-if (menuToggleBtn && sidebar) {
-  menuToggleBtn.addEventListener("click", () => {
-    sidebar.classList.toggle("collapsed");
+  equipamentosSnapshot.forEach((doc) => {
+    const data = doc.data();
+    const [marca, campus] = (data.campus || "").split("|").map(e => e.trim());
+    const tipo = data.tipo;
+    if (!marca || !campus || !tipo) return;
+
+    contagemAtual[marca] ??= {};
+    contagemAtual[marca][campus] ??= {};
+    contagemAtual[marca][campus][tipo] ??= 0;
+    contagemAtual[marca][campus][tipo]++;
   });
-}
-let geojsonLayer; // precisa ficar fora do .then
 
-fetch("data/brazil-states.geojson")
-  .then(response => response.json())
-  .then(geoData => {
+  const progressoPorEstado = {};
+  for (const marca in metas) {
+    for (const campus in metas[marca]) {
+      const metasCampus = metas[marca][campus];
+      const atuaisCampus = contagemAtual[marca]?.[campus] || {};
 
-    geojsonLayer = L.geoJSON(geoData, {
-      style: feature => {
-        const sigla = feature.properties.sigla || feature.properties.UF;
-        const progresso = progressoPorEstado[sigla];
-      
-        if (progresso === undefined) {
-          return {
-            fillColor: "transparent",
-            color: "#eee",       // borda mais clara ainda
-            dashArray: "2,4",    // borda tracejada opcional
-            weight: 0.5,         // borda mais fina
-            fillOpacity: 0
-          };
-        }
-              
-        return {
-          fillColor: getColor(progresso),
-          color: "#333",
-          weight: 1,
-          fillOpacity: 0.7
-        };
-      },
-      
-      onEachFeature: (feature, layer) => {
-        const sigla = feature.properties.sigla || feature.properties.UF;
-        const progresso = progressoPorEstado[sigla] || 0;
-        const nome = feature.properties.nome || sigla;
-      
-        // Verifica se existe pelo menos 1 campus nesse estado
-        const temCampus = campi.some(campus => campus.Estado === sigla);
-      
-        if (temCampus) {
-          layer.bindPopup(`<strong>${nome}</strong><br>Progresso: ${progresso}%`);
-        }
-      
-        layer.on('click', () => {
-          map.fitBounds(layer.getBounds());
-      
-          layer.setStyle({
-            weight: 3,
-            color: document.documentElement.getAttribute('data-theme') === 'dark' ? '#fff' : '#000',
-            dashArray: "",
-            fillOpacity: 0.9
-          });
-      
-          setTimeout(() => {
-            geojsonLayer.resetStyle(layer);
-          }, 4000);
-        });
+      let totalMeta = 0;
+      let totalAtual = 0;
+
+      for (const tipo in metasCampus) {
+        const meta = metasCampus[tipo];
+        const atual = atuaisCampus[tipo] || 0;
+        totalMeta += meta;
+        totalAtual += atual;
       }
-    }).addTo(map);
 
-  })
-  .catch(error => console.error("Erro ao carregar GeoJSON:", error));
-
-  function mostrarToast(mensagem, tipo = "success") {
-    const toast = document.getElementById("toast");
-    const toastIcon = document.getElementById("toast-icon");
-    const toastMessage = document.getElementById("toast-message");
-  
-    toastMessage.textContent = mensagem;
-  
-    if (tipo === "error") {
-      toast.classList.add("error-toast");
-      toastIcon.textContent = "❌";
-    } else {
-      toast.classList.remove("error-toast");
-      toastIcon.textContent = "✔️";
+      const campusInfo = campi.find(c => c.Marca === marca && c.Campus === campus);
+      if (campusInfo) {
+        const percentual = Math.min(100, Math.round((totalAtual / totalMeta) * 100));
+        progressoPorEstado[campusInfo.Estado] ??= 0;
+        progressoPorEstado[campusInfo.Estado] += percentual;
+      }
     }
-  
-    toast.classList.remove("hidden");
-    toast.classList.add("show");
-  
-    setTimeout(() => {
-      toast.classList.remove("show");
-      setTimeout(() => {
-        toast.classList.add("hidden");
-        toast.classList.remove("error-toast"); // limpa classe de erro
-      }, 400);
-    }, 3000);
   }
+
+  return progressoPorEstado;
+}
+
+calcularProgresso().then(progressoPorEstado => {
+  fetch("data/brazil-states.geojson")
+    .then(response => response.json())
+    .then(geoData => {
+      L.geoJSON(geoData, {
+        style: feature => {
+          const sigla = feature.properties.sigla || feature.properties.UF;
+          const progresso = progressoPorEstado[sigla];
+
+          if (progresso === undefined) {
+            return {
+              fillColor: "transparent",
+              color: "#eee",
+              dashArray: "2,4",
+              weight: 0.5,
+              fillOpacity: 0
+            };
+          }
+
+          return {
+            fillColor: getColor(progresso),
+            color: "#333",
+            weight: 1,
+            fillOpacity: 0.7
+          };
+        },
+        onEachFeature: (feature, layer) => {
+          const sigla = feature.properties.sigla || feature.properties.UF;
+          const progresso = progressoPorEstado[sigla] || 0;
+          const nome = feature.properties.nome || sigla;
+
+          const temCampus = campi.some(campus => campus.Estado === sigla);
+          if (temCampus) {
+            layer.bindPopup(`<strong>${nome}</strong><br>Progresso: ${progresso}%`);
+          }
+
+          layer.on('click', () => {
+            map.fitBounds(layer.getBounds());
+            layer.setStyle({
+              weight: 3,
+              color: document.documentElement.getAttribute('data-theme') === 'dark' ? '#fff' : '#000',
+              dashArray: "",
+              fillOpacity: 0.9
+            });
+            setTimeout(() => {
+              layer.setStyle({ weight: 1, color: "#333", dashArray: "", fillOpacity: 0.7 });
+            }, 4000);
+          });
+        }
+      }).addTo(map);
+    })
+    .catch(error => console.error("Erro ao carregar GeoJSON:", error));
+});
