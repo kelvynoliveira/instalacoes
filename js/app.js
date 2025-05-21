@@ -1,7 +1,7 @@
 // app.js
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
 import { getAuth, signInWithPopup, GoogleAuthProvider, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
-import { getFirestore, getDocs, collection } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+import { getFirestore, getDocs, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 import { campi } from "./campi.js";
 import { metas } from "./metas.js";
 
@@ -153,22 +153,31 @@ function abrirPainel(marca, campus, progresso) {
   document.getElementById("campus-form").setAttribute("data-campus", `${marca}|${campus}`);
 }
 
-
 document.getElementById("fechar-painel").addEventListener("click", () => {
   document.getElementById("side-panel").classList.add("hidden");
 });
+
+function mostrarToast(mensagem, tipo = "success") {
+  const toast = document.getElementById("toast");
+  toast.textContent = mensagem;
+  toast.className = tipo === "error" ? "toast error" : "toast success";
+  toast.classList.add("show");
+  setTimeout(() => {
+    toast.classList.remove("show");
+  }, 3000);
+}
 
 document.getElementById("campus-form").addEventListener("submit", async (e) => {
   e.preventDefault();
 
   const form = e.target;
   const campusKey = form.getAttribute("data-campus");
-  const tipo = document.getElementById("tipo_equipamento").value;
+  const tipo = document.getElementById("tipo").value;
   const mac = document.getElementById("mac_address").value.trim();
   const serial = document.getElementById("serial_number").value.trim();
   const status = document.getElementById("status").value;
-  const dataInstalacao = document.getElementById("data_instalacao").value;
-  const observacoes = document.getElementById("observacoes").value.trim();
+  const dataInstalacao = document.getElementById("data").value;
+  const observacoes = document.getElementById("obs").value.trim();
 
   if (mac.length !== 17 || !/^([A-F0-9]{2}:){5}[A-F0-9]{2}$/.test(mac)) {
     document.getElementById("mac_address").classList.add("invalid");
@@ -183,7 +192,7 @@ document.getElementById("campus-form").addEventListener("submit", async (e) => {
       mac_address: mac,
       serial_number: serial,
       status: status,
-      data: dataInstalacao,
+      data_instalacao: dataInstalacao,
       observacoes: observacoes,
       timestamp: new Date()
     });
@@ -196,7 +205,6 @@ document.getElementById("campus-form").addEventListener("submit", async (e) => {
     mostrarToast("Erro ao salvar no Firestore!", "error");
   }
 });
-
 
 function getColor(percentual) {
   if (percentual <= 10) return '#d73027';
@@ -223,7 +231,8 @@ async function calcularProgresso() {
     contagemAtual[marca][campus][tipo]++;
   });
 
-  const progressoPorEstado = {};
+  const progressoSoma = {};
+  const progressoCount = {};
 
   for (const marca in metas) {
     for (const campus in metas[marca]) {
@@ -243,22 +252,21 @@ async function calcularProgresso() {
       const campusInfo = campi.find(c => c.Marca === marca && c.Campus === campus);
       if (campusInfo) {
         const percentual = totalMeta === 0 ? 0 : Math.round((totalAtual / totalMeta) * 100);
-        progressoPorEstado[campusInfo.Estado] ??= [];
-        progressoPorEstado[campusInfo.Estado].push(percentual);
+        progressoSoma[campusInfo.Estado] ??= 0;
+        progressoCount[campusInfo.Estado] ??= 0;
+        progressoSoma[campusInfo.Estado] += percentual;
+        progressoCount[campusInfo.Estado]++;
       }
     }
   }
 
-  const progressoFinalPorEstado = {};
-  for (const estado in progressoPorEstado) {
-    const valores = progressoPorEstado[estado];
-    const media = Math.round(valores.reduce((a, b) => a + b, 0) / valores.length);
-    progressoFinalPorEstado[estado] = media;
+  const progressoPorEstado = {};
+  for (const estado in progressoSoma) {
+    progressoPorEstado[estado] = Math.round(progressoSoma[estado] / progressoCount[estado]);
   }
 
-  return progressoFinalPorEstado;
+  return progressoPorEstado;
 }
-
 
 calcularProgresso().then(progressoPorEstado => {
   fetch("data/brazil-states.geojson")
