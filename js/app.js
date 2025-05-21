@@ -157,6 +157,23 @@ document.getElementById("fechar-painel").addEventListener("click", () => {
   document.getElementById("side-panel").classList.add("hidden");
 });
 
+// Corrigir MAC ao digitar
+const macInput = document.getElementById("mac_address");
+if (macInput) {
+  macInput.addEventListener("input", () => {
+    let value = macInput.value.toUpperCase().replace(/[^A-F0-9]/g, "").substring(0, 12);
+    let formatted = "";
+    for (let i = 0; i < value.length; i += 2) {
+      if (i > 0) formatted += ":";
+      formatted += value.substring(i, i + 2);
+    }
+    macInput.value = formatted;
+    if (formatted.length === 17 && /^([A-F0-9]{2}:){5}[A-F0-9]{2}$/.test(formatted)) {
+      macInput.classList.remove("invalid");
+    }
+  });
+}
+
 function mostrarToast(mensagem, tipo = "success") {
   const toast = document.getElementById("toast");
   toast.textContent = mensagem;
@@ -205,120 +222,3 @@ document.getElementById("campus-form").addEventListener("submit", async (e) => {
     mostrarToast("Erro ao salvar no Firestore!", "error");
   }
 });
-
-function getColor(percentual) {
-  if (percentual <= 10) return '#d73027';
-  if (percentual <= 25) return '#fc8d59';
-  if (percentual <= 50) return '#fee08b';
-  if (percentual <= 85) return '#d9ef8b';
-  if (percentual <= 99) return '#91cf60';
-  return '#1a9850';
-}
-
-async function calcularProgresso() {
-  const equipamentosSnapshot = await getDocs(collection(db, "equipamentos"));
-  const contagemAtual = {};
-
-  equipamentosSnapshot.forEach((doc) => {
-    const data = doc.data();
-    const [marca, campus] = (data.campus || "").split("|").map(e => e.trim());
-    const tipo = data.tipo;
-    if (!marca || !campus || !tipo) return;
-
-    contagemAtual[marca] ??= {};
-    contagemAtual[marca][campus] ??= {};
-    contagemAtual[marca][campus][tipo] ??= 0;
-    contagemAtual[marca][campus][tipo]++;
-  });
-
-  const progressoSoma = {};
-  const progressoCount = {};
-
-  for (const marca in metas) {
-    for (const campus in metas[marca]) {
-      const metasCampus = metas[marca][campus];
-      const atuaisCampus = contagemAtual[marca]?.[campus] || {};
-
-      let totalMeta = 0;
-      let totalAtual = 0;
-
-      for (const tipo in metasCampus) {
-        const meta = metasCampus[tipo];
-        const atual = atuaisCampus[tipo] || 0;
-        totalMeta += meta;
-        totalAtual += atual;
-      }
-
-      const campusInfo = campi.find(c => c.Marca === marca && c.Campus === campus);
-      if (campusInfo) {
-        const percentual = totalMeta === 0 ? 0 : Math.round((totalAtual / totalMeta) * 100);
-        progressoSoma[campusInfo.Estado] ??= 0;
-        progressoCount[campusInfo.Estado] ??= 0;
-        progressoSoma[campusInfo.Estado] += percentual;
-        progressoCount[campusInfo.Estado]++;
-      }
-    }
-  }
-
-  const progressoPorEstado = {};
-  for (const estado in progressoSoma) {
-    progressoPorEstado[estado] = Math.round(progressoSoma[estado] / progressoCount[estado]);
-  }
-
-  return progressoPorEstado;
-}
-
-calcularProgresso().then(progressoPorEstado => {
-  fetch("data/brazil-states.geojson")
-    .then(response => response.json())
-    .then(geoData => {
-      L.geoJSON(geoData, {
-        style: feature => {
-          const sigla = feature.properties.sigla || feature.properties.UF;
-          const progresso = progressoPorEstado[sigla];
-
-          if (progresso === undefined) {
-            return {
-              fillColor: "transparent",
-              color: "#eee",
-              dashArray: "2,4",
-              weight: 0.5,
-              fillOpacity: 0
-            };
-          }
-
-          return {
-            fillColor: getColor(progresso),
-            color: "#333",
-            weight: 1,
-            fillOpacity: 0.7
-          };
-        },
-        onEachFeature: (feature, layer) => {
-          const sigla = feature.properties.sigla || feature.properties.UF;
-          const progresso = progressoPorEstado[sigla] || 0;
-          const nome = feature.properties.nome || sigla;
-
-          const temCampus = campi.some(campus => campus.Estado === sigla);
-          if (temCampus) {
-            layer.bindPopup(`<strong>${nome}</strong><br>Progresso: ${progresso}%`);
-          }
-
-          layer.on('click', () => {
-            map.fitBounds(layer.getBounds());
-            layer.setStyle({
-              weight: 3,
-              color: document.documentElement.getAttribute('data-theme') === 'dark' ? '#fff' : '#000',
-              dashArray: "",
-              fillOpacity: 0.9
-            });
-            setTimeout(() => {
-              layer.setStyle({ weight: 1, color: "#333", dashArray: "", fillOpacity: 0.7 });
-            }, 4000);
-          });
-        }
-      }).addTo(map);
-    })
-    .catch(error => console.error("Erro ao carregar GeoJSON:", error));
-});
-
