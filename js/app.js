@@ -153,9 +153,50 @@ function abrirPainel(marca, campus, progresso) {
   document.getElementById("campus-form").setAttribute("data-campus", `${marca}|${campus}`);
 }
 
+
 document.getElementById("fechar-painel").addEventListener("click", () => {
   document.getElementById("side-panel").classList.add("hidden");
 });
+
+document.getElementById("campus-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const form = e.target;
+  const campusKey = form.getAttribute("data-campus");
+  const tipo = document.getElementById("tipo_equipamento").value;
+  const mac = document.getElementById("mac_address").value.trim();
+  const serial = document.getElementById("serial_number").value.trim();
+  const status = document.getElementById("status").value;
+  const dataInstalacao = document.getElementById("data_instalacao").value;
+  const observacoes = document.getElementById("observacoes").value.trim();
+
+  if (mac.length !== 17 || !/^([A-F0-9]{2}:){5}[A-F0-9]{2}$/.test(mac)) {
+    document.getElementById("mac_address").classList.add("invalid");
+    mostrarToast("Por favor, insira um MAC Address válido!", "error");
+    return;
+  }
+
+  try {
+    await addDoc(collection(db, "equipamentos"), {
+      campus: campusKey,
+      tipo: tipo,
+      mac_address: mac,
+      serial_number: serial,
+      status: status,
+      data: dataInstalacao,
+      observacoes: observacoes,
+      timestamp: new Date()
+    });
+
+    mostrarToast("Equipamento salvo com sucesso!");
+    form.reset();
+    document.getElementById("side-panel").classList.add("hidden");
+  } catch (error) {
+    console.error("Erro ao salvar no Firestore:", error);
+    mostrarToast("Erro ao salvar no Firestore!", "error");
+  }
+});
+
 
 function getColor(percentual) {
   if (percentual <= 10) return '#d73027';
