@@ -223,6 +223,7 @@ document.getElementById("campus-form").addEventListener("submit", async (e) => {
   }
 });
 function getColor(percentual) {
+  console.log(percentual);
   if (percentual <= 10) return '#d73027';
   if (percentual <= 25) return '#fc8d59';
   if (percentual <= 50) return '#fee08b';
@@ -299,8 +300,9 @@ calcularProgresso().then(progressoPorEstado => {
       L.geoJSON(geoData, {
         style: feature => {
           const sigla = (feature.properties.sigla || feature.properties.UF).trim().toUpperCase();
+          console.log(sigla);
           const progresso = progressoPorEstado[sigla];
-
+          console.log(progresso)
           if (progresso === undefined) {
             return {
               fillColor: "transparent",
