@@ -29,6 +29,7 @@ loginBtn.onclick = () => {
     userInfo.textContent = `Olá, ${user.displayName}`;
     loginBtn.style.display = "none";
     logoutBtn.style.display = "inline";
+     atualizarMapa();
   });
 };
 
@@ -241,9 +242,7 @@ async function calcularProgresso() {
     const data = doc.data();
     const [marca, campus] = (data.campus || "").split("|").map(e => e.trim().toUpperCase());
     const tipo = (data.tipo || "").toLowerCase();
-
     if (!marca || !campus || !tipo) return;
-
     contagemAtual[marca] ??= {};
     contagemAtual[marca][campus] ??= {};
     contagemAtual[marca][campus][tipo] ??= 0;
@@ -262,16 +261,22 @@ async function calcularProgresso() {
       let totalAtual = 0;
 
       for (const tipo in metasCampus) {
-        const meta = metasCampus[tipo];
-        const atual = atuaisCampus[tipo] || 0;
-        totalMeta += meta;
-        totalAtual += atual;
+        totalMeta += metasCampus[tipo];
+        totalAtual += atuaisCampus[tipo] || 0;
       }
 
-      const campusInfo = campi.find(c => 
-        c.Marca.trim().toUpperCase() === marca.trim().toUpperCase() && 
-        c.Campus.trim().toUpperCase() === campus.trim().toUpperCase()
-      );
+      const campusInfo = campi.find(c => {
+        const match = c.Marca.trim().toUpperCase() === marca.trim().toUpperCase() &&
+                      c.Campus.trim().toUpperCase() === campus.trim().toUpperCase();
+        if (!match && c.Marca.trim().toUpperCase() === marca.trim().toUpperCase()) {
+          console.warn("Campus não encontrado para:", {
+            marca: marca.trim().toUpperCase(),
+            esperado: campus.trim().toUpperCase(),
+            existente: c.Campus.trim().toUpperCase()
+          });
+        }
+        return match;
+      });
 
       if (campusInfo) {
         const estado = campusInfo.Estado.trim().toUpperCase();
@@ -289,61 +294,48 @@ async function calcularProgresso() {
     progressoPorEstado[estado] = Math.round(progressoSoma[estado] / progressoCount[estado]);
   }
 
+  console.table(progressoPorEstado);
   return progressoPorEstado;
 }
 
 // Aplicar cores no mapa conforme o progresso
-calcularProgresso().then(progressoPorEstado => {
-  fetch("data/brazil-states.geojson")
-    .then(response => response.json())
-    .then(geoData => {
-      L.geoJSON(geoData, {
-        style: feature => {
-          const sigla = (feature.properties.sigla || feature.properties.UF).trim().toUpperCase();
-          console.log(sigla);
-          const progresso = progressoPorEstado[sigla];
-          console.log(progresso)
-          if (progresso === undefined) {
+function atualizarMapa() {
+  calcularProgresso().then(progressoPorEstado => {
+    fetch("data/brazil-states.geojson")
+      .then(response => response.json())
+      .then(geoData => {
+        L.geoJSON(geoData, {
+          style: feature => {
+            const sigla = (feature.properties.sigla || feature.properties.UF).trim().toUpperCase();
+            const progresso = progressoPorEstado[sigla];
+            if (progresso === undefined) {
+              return {
+                fillColor: "transparent",
+                color: "#eee",
+                dashArray: "2,4",
+                weight: 0.5,
+                fillOpacity: 0
+              };
+            }
             return {
-              fillColor: "transparent",
-              color: "#eee",
-              dashArray: "2,4",
-              weight: 0.5,
-              fillOpacity: 0
+              fillColor: getColor(progresso),
+              color: "#333",
+              weight: 1,
+              fillOpacity: 0.7
             };
+          },
+          onEachFeature: (feature, layer) => {
+            const sigla = (feature.properties.sigla || feature.properties.UF).trim().toUpperCase();
+            const progresso = progressoPorEstado[sigla] || 0;
+            const nome = feature.properties.nome || sigla;
+            const temCampus = campi.some(c => c.Estado.trim().toUpperCase() === sigla);
+            if (temCampus) {
+              layer.bindPopup(`<strong>${nome}</strong><br>Progresso: ${progresso}%`);
+            }
           }
+        }).addTo(map);
+      });
+  });
+}
 
-          return {
-            fillColor: getColor(progresso),
-            color: "#333",
-            weight: 1,
-            fillOpacity: 0.7
-          };
-        },
-        onEachFeature: (feature, layer) => {
-          const sigla = (feature.properties.sigla || feature.properties.UF).trim().toUpperCase();
-          const progresso = progressoPorEstado[sigla] || 0;
-          const nome = feature.properties.nome || sigla;
-
-          const temCampus = campi.some(campus => campus.Estado.trim().toUpperCase() === sigla);
-          if (temCampus) {
-            layer.bindPopup(`<strong>${nome}</strong><br>Progresso: ${progresso}%`);
-          }
-
-          layer.on('click', () => {
-            map.fitBounds(layer.getBounds());
-            layer.setStyle({
-              weight: 3,
-              color: document.documentElement.getAttribute('data-theme') === 'dark' ? '#fff' : '#000',
-              dashArray: "",
-              fillOpacity: 0.9
-            });
-            setTimeout(() => {
-              layer.setStyle({ weight: 1, color: "#333", dashArray: "", fillOpacity: 0.7 });
-            }, 4000);
-          });
-        }
-      }).addTo(map);
-    })
-    .catch(error => console.error("Erro ao carregar GeoJSON:", error));
-});
+atualizarMapa();
