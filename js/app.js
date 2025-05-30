@@ -247,6 +247,7 @@ async function calcularProgresso() {
     contagemAtual[marca][campus] ??= {};
     contagemAtual[marca][campus][tipo] ??= 0;
     contagemAtual[marca][campus][tipo]++;
+    console.log("Firestore:", { campus: data.campus, tipo: data.tipo });
   });
 
   const progressoSoma = {};
@@ -273,9 +274,14 @@ async function calcularProgresso() {
             marca: marca.trim().toUpperCase(),
             esperado: campus.trim().toUpperCase(),
             existente: c.Campus.trim().toUpperCase()
+            
           });
         }
         return match;
+        console.warn("🔍 Match falhou para:", {
+  marca: marca.trim().toUpperCase(),
+  campus: campus.trim().toUpperCase()
+});
       });
 
       if (campusInfo) {
