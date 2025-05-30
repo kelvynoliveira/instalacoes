@@ -151,9 +151,9 @@ campi.forEach(campus => {
     const popupNode = e.popup.getElement();
     const btn = popupNode.querySelector(".open-panel-btn");
     if (btn) {
-      btn.addEventListener("click", () => {
-        abrirPainel(btn.dataset.marca, btn.dataset.campus, btn.dataset.progresso);
-      });
+btn.addEventListener("click", () => {
+  abrirPainel(`${btn.dataset.marca}|${btn.dataset.campus}`, btn.dataset.progresso);
+});
     }
   });
 });
