@@ -41,6 +41,18 @@ logoutBtn.onclick = () => {
   });
 };
 
+function normalizarTexto(texto) {
+  return texto.normalize("NFD").replace(/\p{Diacritic}/gu, "").trim().toUpperCase();
+}
+
+function abrirPainel(marca, campus, progresso) {
+  document.getElementById("side-panel").classList.remove("hidden");
+  document.getElementById("panel-title").innerText = `${marca} - ${campus} (${progresso}% concluído)`;
+  document.getElementById("campus-form").setAttribute("data-campus", campus);
+}
+
+window.abrirPainel = abrirPainel;
+
 const map = L.map("map").setView([-15.8, -47.9], 4);
 
 const tileLight = L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
@@ -147,12 +159,6 @@ campi.forEach(campus => {
 });
 
 map.addLayer(markers);
-
-function abrirPainel(marca, campus, progresso) {
-  document.getElementById("side-panel").classList.remove("hidden");
-  document.getElementById("panel-title").innerText = `${marca} - ${campus} (${progresso}% concluído)`;
-  document.getElementById("campus-form").setAttribute("data-campus", `${marca}|${campus}`);
-}
 
 document.getElementById("fechar-painel").addEventListener("click", () => {
   document.getElementById("side-panel").classList.add("hidden");
