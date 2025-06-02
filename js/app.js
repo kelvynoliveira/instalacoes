@@ -75,7 +75,9 @@ logoutBtn.onclick = () => {
   signOut(auth);
 };
 function normalizarChave(texto) {
-  return texto.normalize("NFD").replace(/\p{Diacritic}/gu, "").replace(/\s+/g, "").toUpperCase();
+  return texto
+    .normalize("NFD").replace(/\p{Diacritic}/gu, "")
+    .replace(/\s+/g, "").toUpperCase();
 }
 
 function abrirPainel(campusCompleto, progresso) {
@@ -290,39 +292,41 @@ async function calcularProgresso() {
   const progressoSoma = {};
   const progressoCount = {};
 
-for (const campusKey in metas) {
-  const metasCampus = metas[campusKey];
-  const campusKeyNormalizado = normalizarChave(campusKey);
-  const atuaisCampus = contagemAtual[campusKeyNormalizado] || {};
+  for (const campusKey in metas) {
+    const metasCampus = metas[campusKey];
+    const campusKeyNormalizado = normalizarChave(campusKey);
+    const atuaisCampus = contagemAtual[campusKeyNormalizado] || {}; // <-- Esta linha estava faltando!
 
-  let totalMeta = 0;
-  let totalAtual = 0;
+    const campusInfo = campi.find(c => 
+      normalizarChave(`${c.Marca}|${c.Campus}`) === campusKeyNormalizado
+    );
 
-  for (const tipo in metasCampus) {
-    totalMeta += metasCampus[tipo];
-    totalAtual += atuaisCampus[tipo] || 0;
+    if (!campusInfo) {
+      console.warn("Campus não encontrado:", { 
+        campusKeyOriginal: campusKey,
+        campusKeyNormalizado,
+        listaCampi: campi.map(c => normalizarChave(`${c.Marca}|${c.Campus}`))
+      });
+      continue;
+    }
+
+    let totalMeta = 0;
+    let totalAtual = 0;
+
+    for (const tipo in metasCampus) {
+      totalMeta += metasCampus[tipo];
+      totalAtual += atuaisCampus[tipo] || 0; // <-- Usando atuaisCampus aqui
+    }
+
+    const estado = campusInfo.Estado.trim().toUpperCase();
+    const percentual = totalMeta === 0 ? 0 : Math.round((totalAtual / totalMeta) * 100);
+    
+    progressoSoma[estado] ??= 0;
+    progressoCount[estado] ??= 0;
+    progressoSoma[estado] += percentual;
+    progressoCount[estado]++;
   }
 
-  const campusInfo = campi.find(c =>
-    normalizarChave(`${c.Marca}|${c.Campus}`) === campusKeyNormalizado
-  );
-
-if (!campusInfo) {
-  console.warn("Campus não encontrado:", {
-    campusKeyOriginal: campusKey,
-    campusKeyNormalizado,
-    listaCampi: campi.map(c => normalizarChave(`${c.Marca}|${c.Campus}`))
-  });
-  continue;
-}
-
-  const estado = campusInfo.Estado.trim().toUpperCase();
-  const percentual = totalMeta === 0 ? 0 : Math.round((totalAtual / totalMeta) * 100);
-  progressoSoma[estado] ??= 0;
-  progressoCount[estado] ??= 0;
-  progressoSoma[estado] += percentual;
-  progressoCount[estado]++;
-}
   for (const estado in progressoSoma) {
     progressoPorEstado[estado] = Math.round(progressoSoma[estado] / progressoCount[estado]);
   }
