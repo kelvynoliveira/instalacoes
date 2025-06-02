@@ -1,7 +1,6 @@
 export const campi = [
   { Marca: "UNISUL", Campus: "UNISUL|TUBARAO", Cidade: "Tubarão", Estado: "SC", Latitude: -28.471684, Longitude: -49.014593 },
   { Marca: "UNR", Campus: "UNR|CANOAS", Cidade: "Canoas", Estado: "RS", Latitude: -29.9228474, Longitude: -51.1849143 },
-  { Marca: "UNR", Campus: "UNR|FAPA", Cidade: "Porto Alegre", Estado: "RS", Latitude: -30.0108703, Longitude: -51.153766 },
   { Marca: "UNR", Campus: "UNR|ZONASUL", Cidade: "Porto Alegre", Estado: "RS", Latitude: -30.0884264, Longitude: -51.2345951 },
   { Marca: "UNISOCIESC", Campus: "UNISOCIESC|ANITAGARIBALDI", Cidade: "Joinville", Estado: "SC", Latitude: -26.305488, Longitude: -48.846592 },
   { Marca: "UNISOCIESC", Campus: "UNISOCIESC|BLUMENAU", Cidade: "Blumenau", Estado: "SC", Latitude: -26.918812, Longitude: -49.0665147 },
