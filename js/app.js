@@ -40,9 +40,8 @@ logoutBtn.onclick = () => {
     logoutBtn.style.display = "none";
   });
 };
-
-function normalizarTexto(texto) {
-  return texto.normalize("NFD").replace(/\p{Diacritic}/gu, "").trim().toUpperCase();
+function normalizarChave(texto) {
+  return texto.normalize("NFD").replace(/\p{Diacritic}/gu, "").replace(/\s+/g, "").toUpperCase();
 }
 
 function abrirPainel(campusCompleto, progresso) {
@@ -245,14 +244,14 @@ async function calcularProgresso() {
 
   equipamentosSnapshot.forEach((doc) => {
     const data = doc.data();
-const campusKey = (data.campus || "").trim().toUpperCase();
-const tipo = (data.tipo || "").toLowerCase();
-if (!campusKey || !tipo) return;
-contagemAtual[campusKey] ??= {};
-contagemAtual[campusKey][tipo] ??= 0;
-contagemAtual[campusKey][tipo]++;
-    console.log("Firestore:", { campus: data.campus, tipo: data.tipo });
+    const campusKey = normalizarChave(data.campus || "");
+    const tipo = (data.tipo || "").toLowerCase();
+    if (!campusKey || !tipo) return;
+    contagemAtual[campusKey] ??= {};
+    contagemAtual[campusKey][tipo] ??= 0;
+    contagemAtual[campusKey][tipo]++;
   });
+
   const progressoPorEstado = {};
   const progressoSoma = {};
   const progressoCount = {};
@@ -260,8 +259,8 @@ contagemAtual[campusKey][tipo]++;
   for (const marca in metas) {
     for (const campus in metas[marca]) {
       const metasCampus = metas[marca][campus];
-  const campusKey = `${marca}|${campus}`.toUpperCase();
-const atuaisCampus = contagemAtual[campusKey] || {};
+      const campusKey = normalizarChave(`${marca}|${campus}`);
+      const atuaisCampus = contagemAtual[campusKey] || {};
 
       let totalMeta = 0;
       let totalAtual = 0;
@@ -271,31 +270,29 @@ const atuaisCampus = contagemAtual[campusKey] || {};
         totalAtual += atuaisCampus[tipo] || 0;
       }
 
-const campusInfo = campi.find(c => c.Marca.trim().toUpperCase() === marca.trim().toUpperCase() && 
-  c.Campus.trim().toUpperCase() === campus.trim().toUpperCase());
+      const campusInfo = campi.find(c => normalizarChave(`${c.Marca}|${c.Campus}`) === campusKey);
 
-if (!campusInfo) {
-  console.warn("Campus não encontrado para:", {
-    esperado: campusKey,
-    lista: campi.map(c => c.Campus.trim().toUpperCase())
-  });
-} else {
-  const estado = campusInfo.Estado.trim().toUpperCase();
-  const percentual = totalMeta === 0 ? 0 : Math.round((totalAtual / totalMeta) * 100);
-  progressoSoma[estado] ??= 0;
-  progressoCount[estado] ??= 0;
-  progressoSoma[estado] += percentual;
-  progressoCount[estado]++;
-}
+      if (!campusInfo) {
+        console.warn("Campus não encontrado para:", campusKey);
+        continue;
+      }
+
+      const estado = campusInfo.Estado.trim().toUpperCase();
+      const percentual = totalMeta === 0 ? 0 : Math.round((totalAtual / totalMeta) * 100);
+      progressoSoma[estado] ??= 0;
+      progressoCount[estado] ??= 0;
+      progressoSoma[estado] += percentual;
+      progressoCount[estado]++;
     }
+  }
 
   for (const estado in progressoSoma) {
     progressoPorEstado[estado] = Math.round(progressoSoma[estado] / progressoCount[estado]);
   }
-  }
-  console.table(progressoPorEstado);
+ console.table(progressoPorEstado);
   return progressoPorEstado;
 }
+
 
 
 // Aplicar cores no mapa conforme o progresso
