@@ -256,7 +256,7 @@ async function calcularProgresso() {
   const progressoSoma = {};
   const progressoCount = {};
 
-  for (const campusKey in metas) {
+for (const campusKey in metas) {
   const metasCampus = metas[campusKey];
   const campusKeyNormalizado = normalizarChave(campusKey);
   const atuaisCampus = contagemAtual[campusKeyNormalizado] || {};
@@ -273,10 +273,14 @@ async function calcularProgresso() {
     normalizarChave(`${c.Marca}|${c.Campus}`) === campusKeyNormalizado
   );
 
-  if (!campusInfo) {
-    console.warn("Campus não encontrado para:", campusKey);
-    continue;
-  }
+if (!campusInfo) {
+  console.warn("Campus não encontrado:", {
+    campusKeyOriginal: campusKey,
+    campusKeyNormalizado,
+    listaCampi: campi.map(c => normalizarChave(`${c.Marca}|${c.Campus}`))
+  });
+  continue;
+}
 
   const estado = campusInfo.Estado.trim().toUpperCase();
   const percentual = totalMeta === 0 ? 0 : Math.round((totalAtual / totalMeta) * 100);
