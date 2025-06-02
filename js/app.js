@@ -1,9 +1,12 @@
 // app.js
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
 import { getAuth, signInWithPopup, GoogleAuthProvider, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
-import { getFirestore, getDocs, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+import { getFirestore, getDocs, collection, addDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 import { campi } from "./campi.js";
 import { metas } from "./metas.js";
+
+let geoJsonLayer = null;      // Controla o layer do mapa
+let unsubscribeEquipamentos = null; // Controla o listener do Firebase
 
 const firebaseConfig = {
   apiKey: "AIzaSyCInOO9hKImhDPZeIYLY2aUKfyeAROpaMU",
@@ -23,22 +26,53 @@ const loginBtn = document.getElementById("login-btn");
 const logoutBtn = document.getElementById("logout-btn");
 const userInfo = document.getElementById("user-info");
 
-loginBtn.onclick = () => {
-  signInWithPopup(auth, provider).then(result => {
-    const user = result.user;
-    userInfo.textContent = `Olá, ${user.displayName}`;
-    loginBtn.style.display = "none";
-    logoutBtn.style.display = "inline";
-    atualizarMapa();
+function configurarListenerEquipamentos() {
+  if (unsubscribeEquipamentos) {
+    unsubscribeEquipamentos();
+    unsubscribeEquipamentos = null;
+  }
+
+  // Adicione um debounce para evitar múltiplas chamadas rápidas
+  let timeout;
+  unsubscribeEquipamentos = onSnapshot(collection(db, "equipamentos"), (snapshot) => {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => {
+      if (!snapshot.metadata.hasPendingWrites) {
+        calcularProgresso()
+          .then(aplicarCoresNoMapa)
+          .catch(error => console.error("Erro ao atualizar mapa:", error));
+      }
+    }, 300); // Aguarda 300ms antes de atualizar
   });
+}
+
+loginBtn.onclick = () => {
+  signInWithPopup(auth, provider)
+    .then(() => {
+      calcularProgresso()
+        .then(aplicarCoresNoMapa)
+        .catch(error => {
+          console.error("Erro ao carregar progresso inicial:", error);
+          mostrarToast("Erro ao carregar dados iniciais", "error");
+        });
+      configurarListenerEquipamentos();
+    })
+    .catch(error => {
+      console.error("Erro no login:", error);
+      mostrarToast("Falha no login", "error");
+    });
 };
 
 logoutBtn.onclick = () => {
-  signOut(auth).then(() => {
-    userInfo.textContent = "";
-    loginBtn.style.display = "inline";
-    logoutBtn.style.display = "none";
-  });
+  if (unsubscribeEquipamentos) {
+    unsubscribeEquipamentos();
+    unsubscribeEquipamentos = null;
+  }
+  if (geoJsonLayer) {
+    map.removeLayer(geoJsonLayer);
+    geoJsonLayer = null;
+  }
+  signOut(auth);
 };
 function normalizarChave(texto) {
   return texto.normalize("NFD").replace(/\p{Diacritic}/gu, "").replace(/\s+/g, "").toUpperCase();
@@ -298,43 +332,35 @@ if (!campusInfo) {
 }
 
 // Aplicar cores no mapa conforme o progresso
-function atualizarMapa() {
-  calcularProgresso().then(progressoPorEstado => {
-    fetch("data/brazil-states.geojson")
-      .then(response => response.json())
-      .then(geoData => {
-        L.geoJSON(geoData, {
-          style: feature => {
-            const sigla = (feature.properties.sigla || feature.properties.UF).trim().toUpperCase();
-            const progresso = progressoPorEstado[sigla];
-            if (progresso === undefined) {
-              return {
-                fillColor: "transparent",
-                color: "#eee",
-                dashArray: "2,4",
-                weight: 0.5,
-                fillOpacity: 0
-              };
-            }
-            return {
-              fillColor: getColor(progresso),
-              color: "#333",
-              weight: 1,
-              fillOpacity: 0.7
-            };
-          },
-          onEachFeature: (feature, layer) => {
-            const sigla = (feature.properties.sigla || feature.properties.UF).trim().toUpperCase();
-            const progresso = progressoPorEstado[sigla] || 0;
-            const nome = feature.properties.nome || sigla;
-            const temCampus = campi.some(c => c.Estado.trim().toUpperCase() === sigla);
-            if (temCampus) {
-              layer.bindPopup(`<strong>${nome}</strong><br>Progresso: ${progresso}%`);
-            }
-          }
-        }).addTo(map);
-      });
-  });
-}
+function aplicarCoresNoMapa(progressoPorEstado) {
+  fetch("data/brazil-states.geojson")
+    .then(response => {
+      if (!response.ok) throw new Error("Falha ao carregar GeoJSON");
+      return response.json();
+    })
+    .then(geoData => {
+      if (geoJsonLayer) map.removeLayer(geoJsonLayer); // Remove layer antigo
 
-atualizarMapa();
+      geoJsonLayer = L.geoJSON(geoData, {  // <-- Esta linha estava faltando
+        style: (feature) => {
+          const sigla = feature.properties.sigla.trim().toUpperCase();
+          const progresso = progressoPorEstado[sigla] ?? 0;
+          return {
+            fillColor: getColor(progresso),
+            color: "#333",
+            weight: 1,
+            fillOpacity: 0.7
+          };
+        },
+        onEachFeature: (feature, layer) => {
+          const sigla = feature.properties.sigla.trim().toUpperCase();
+          const progresso = progressoPorEstado[sigla] ?? 0;
+          layer.bindPopup(`<strong>${feature.properties.nome}</strong><br>Progresso: ${progresso}%`);
+        }
+      }).addTo(map);
+    })
+    .catch(error => {
+      console.error("Erro ao carregar mapa:", error);
+      mostrarToast("Erro ao carregar mapa!", "error");
+    });
+}
