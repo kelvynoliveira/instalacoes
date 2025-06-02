@@ -245,13 +245,12 @@ async function calcularProgresso() {
 
   equipamentosSnapshot.forEach((doc) => {
     const data = doc.data();
-    const [marca, campus] = (data.campus || "").split("|").map(e => e.trim().toUpperCase());
-    const tipo = (data.tipo || "").toLowerCase();
-    if (!marca || !campus || !tipo) return;
-    contagemAtual[marca] ??= {};
-    contagemAtual[marca][campus] ??= {};
-    contagemAtual[marca][campus][tipo] ??= 0;
-    contagemAtual[marca][campus][tipo]++;
+const campusKey = (data.campus || "").trim().toUpperCase();
+const tipo = (data.tipo || "").toLowerCase();
+if (!campusKey || !tipo) return;
+contagemAtual[campusKey] ??= {};
+contagemAtual[campusKey][tipo] ??= 0;
+contagemAtual[campusKey][tipo]++;
     console.log("Firestore:", { campus: data.campus, tipo: data.tipo });
   });
 
@@ -261,7 +260,8 @@ async function calcularProgresso() {
   for (const marca in metas) {
     for (const campus in metas[marca]) {
       const metasCampus = metas[marca][campus];
-      const atuaisCampus = contagemAtual[marca.toUpperCase()]?.[campus.toUpperCase()] || {};
+  const campusKey = `${marca}|${campus}`.toUpperCase();
+const atuaisCampus = contagemAtual[campusKey] || {};
 
       let totalMeta = 0;
       let totalAtual = 0;
