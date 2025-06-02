@@ -253,7 +253,7 @@ contagemAtual[campusKey][tipo] ??= 0;
 contagemAtual[campusKey][tipo]++;
     console.log("Firestore:", { campus: data.campus, tipo: data.tipo });
   });
-
+  const progressoPorEstado = {};
   const progressoSoma = {};
   const progressoCount = {};
 
@@ -271,33 +271,32 @@ const atuaisCampus = contagemAtual[campusKey] || {};
         totalAtual += atuaisCampus[tipo] || 0;
       }
 
+const campusInfo = campi.find(c => c.Marca.trim().toUpperCase() === marca.trim().toUpperCase() && 
+  c.Campus.trim().toUpperCase() === campus.trim().toUpperCase());
+
 if (!campusInfo) {
   console.warn("Campus não encontrado para:", {
     esperado: campusKey,
     lista: campi.map(c => c.Campus.trim().toUpperCase())
   });
+} else {
+  const estado = campusInfo.Estado.trim().toUpperCase();
+  const percentual = totalMeta === 0 ? 0 : Math.round((totalAtual / totalMeta) * 100);
+  progressoSoma[estado] ??= 0;
+  progressoCount[estado] ??= 0;
+  progressoSoma[estado] += percentual;
+  progressoCount[estado]++;
 }
-
-
-      if (campusInfo) {
-        const estado = campusInfo.Estado.trim().toUpperCase();
-        const percentual = totalMeta === 0 ? 0 : Math.round((totalAtual / totalMeta) * 100);
-        progressoSoma[estado] ??= 0;
-        progressoCount[estado] ??= 0;
-        progressoSoma[estado] += percentual;
-        progressoCount[estado]++;
-      }
     }
-  }
 
-  const progressoPorEstado = {};
   for (const estado in progressoSoma) {
     progressoPorEstado[estado] = Math.round(progressoSoma[estado] / progressoCount[estado]);
   }
-
+  }
   console.table(progressoPorEstado);
   return progressoPorEstado;
 }
+
 
 // Aplicar cores no mapa conforme o progresso
 function atualizarMapa() {
