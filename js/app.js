@@ -257,11 +257,10 @@ async function calcularProgresso() {
   const progressoCount = {};
 
   for (const marca in metas) {
-  for (const campusKey in metas[marca]) {
-    const metasCampus = metas[marca][campusKey];
-    const campusKeyNormalizado = normalizarChave(campusKey);
-    const atuaisCampus = contagemAtual[campusKeyNormalizado] || {};
-
+    for (const campusKey in metas[marca]) {
+      const metasCampus = metas[marca][campusKey];
+      const campusKeyNormalizado = normalizarChave(campusKey);
+      const atuaisCampus = contagemAtual[campusKeyNormalizado] || {};
 
       let totalMeta = 0;
       let totalAtual = 0;
@@ -271,7 +270,9 @@ async function calcularProgresso() {
         totalAtual += atuaisCampus[tipo] || 0;
       }
 
-      const campusInfo = campi.find(c => normalizarChave(`${c.Marca}|${c.Campus}`) === campusKeyNormalizado);
+      const campusInfo = campi.find(c =>
+        normalizarChave(`${c.Marca}|${c.Campus}`) === campusKeyNormalizado
+      );
 
       if (!campusInfo) {
         console.warn("Campus não encontrado para:", campusKey);
@@ -290,11 +291,10 @@ async function calcularProgresso() {
   for (const estado in progressoSoma) {
     progressoPorEstado[estado] = Math.round(progressoSoma[estado] / progressoCount[estado]);
   }
- console.table(progressoPorEstado);
+
+  console.table(progressoPorEstado);
   return progressoPorEstado;
 }
-
-
 
 // Aplicar cores no mapa conforme o progresso
 function atualizarMapa() {
