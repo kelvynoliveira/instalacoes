@@ -295,17 +295,16 @@ async function calcularProgresso() {
   for (const campusKey in metas) {
     const metasCampus = metas[campusKey];
     const campusKeyNormalizado = normalizarChave(campusKey);
-    const atuaisCampus = contagemAtual[campusKeyNormalizado] || {}; // <-- Esta linha estava faltando!
+    const atuaisCampus = contagemAtual[campusKeyNormalizado] || {};
 
-    const campusInfo = campi.find(c => 
-      normalizarChave(`${c.Marca}|${c.Campus}`) === campusKeyNormalizado
-    );
+    // Correção: Busca pelo ID já normalizado (não precisa normalizar novamente)
+    const campusInfo = campi.find(c => c.id === campusKeyNormalizado);
 
     if (!campusInfo) {
       console.warn("Campus não encontrado:", { 
         campusKeyOriginal: campusKey,
         campusKeyNormalizado,
-        listaCampi: campi.map(c => normalizarChave(`${c.Marca}|${c.Campus}`))
+        listaCampi: campi.map(c => c.id) // Mostra os IDs reais para comparação
       });
       continue;
     }
@@ -315,7 +314,7 @@ async function calcularProgresso() {
 
     for (const tipo in metasCampus) {
       totalMeta += metasCampus[tipo];
-      totalAtual += atuaisCampus[tipo] || 0; // <-- Usando atuaisCampus aqui
+      totalAtual += atuaisCampus[tipo] || 0;
     }
 
     const estado = campusInfo.Estado.trim().toUpperCase();
