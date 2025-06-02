@@ -135,7 +135,7 @@ campi.forEach(campus => {
     ${campus.Campus}<br>
     ${campus.Cidade} - ${campus.Estado}<br>
     <button class="open-panel-btn" 
-            data-campus="${campus.Marca}|${campus.Campus}" 
+            data-campus="${campus.Campus}"
             data-progresso="0">
       Atualizar status
     </button>
