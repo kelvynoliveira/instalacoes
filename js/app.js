@@ -257,10 +257,11 @@ async function calcularProgresso() {
   const progressoCount = {};
 
   for (const marca in metas) {
-    for (const campus in metas[marca]) {
-      const metasCampus = metas[marca][campus];
-      const campusKey = normalizarChave(`${marca}|${campus}`);
-      const atuaisCampus = contagemAtual[campusKey] || {};
+  for (const campusKey in metas[marca]) {
+    const metasCampus = metas[marca][campusKey];
+    const campusKeyNormalizado = normalizarChave(campusKey);
+    const atuaisCampus = contagemAtual[campusKeyNormalizado] || {};
+
 
       let totalMeta = 0;
       let totalAtual = 0;
