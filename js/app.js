@@ -256,38 +256,35 @@ async function calcularProgresso() {
   const progressoSoma = {};
   const progressoCount = {};
 
-  for (const marca in metas) {
-    for (const campusKey in metas[marca]) {
-      const metasCampus = metas[marca][campusKey];
-      const campusKeyNormalizado = normalizarChave(campusKey);
-      const atuaisCampus = contagemAtual[campusKeyNormalizado] || {};
+  for (const campusKey in metas) {
+  const metasCampus = metas[campusKey];
+  const campusKeyNormalizado = normalizarChave(campusKey);
+  const atuaisCampus = contagemAtual[campusKeyNormalizado] || {};
 
-      let totalMeta = 0;
-      let totalAtual = 0;
+  let totalMeta = 0;
+  let totalAtual = 0;
 
-      for (const tipo in metasCampus) {
-        totalMeta += metasCampus[tipo];
-        totalAtual += atuaisCampus[tipo] || 0;
-      }
-
-      const campusInfo = campi.find(c =>
-        normalizarChave(`${c.Marca}|${c.Campus}`) === campusKeyNormalizado
-      );
-
-      if (!campusInfo) {
-        console.warn("Campus não encontrado para:", campusKey);
-        continue;
-      }
-
-      const estado = campusInfo.Estado.trim().toUpperCase();
-      const percentual = totalMeta === 0 ? 0 : Math.round((totalAtual / totalMeta) * 100);
-      progressoSoma[estado] ??= 0;
-      progressoCount[estado] ??= 0;
-      progressoSoma[estado] += percentual;
-      progressoCount[estado]++;
-    }
+  for (const tipo in metasCampus) {
+    totalMeta += metasCampus[tipo];
+    totalAtual += atuaisCampus[tipo] || 0;
   }
 
+  const campusInfo = campi.find(c =>
+    normalizarChave(`${c.Marca}|${c.Campus}`) === campusKeyNormalizado
+  );
+
+  if (!campusInfo) {
+    console.warn("Campus não encontrado para:", campusKey);
+    continue;
+  }
+
+  const estado = campusInfo.Estado.trim().toUpperCase();
+  const percentual = totalMeta === 0 ? 0 : Math.round((totalAtual / totalMeta) * 100);
+  progressoSoma[estado] ??= 0;
+  progressoCount[estado] ??= 0;
+  progressoSoma[estado] += percentual;
+  progressoCount[estado]++;
+}
   for (const estado in progressoSoma) {
     progressoPorEstado[estado] = Math.round(progressoSoma[estado] / progressoCount[estado]);
   }
