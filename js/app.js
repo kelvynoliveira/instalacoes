@@ -343,23 +343,30 @@ function aplicarCoresNoMapa(progressoPorEstado) {
       return response.json();
     })
     .then(geoData => {
-      if (geoJsonLayer) map.removeLayer(geoJsonLayer); // Remove layer antigo
+      if (geoJsonLayer) map.removeLayer(geoJsonLayer);
 
-      geoJsonLayer = L.geoJSON(geoData, {  // <-- Esta linha estava faltando
+      // Cria um array de estados que possuem campi
+      const estadosComCampi = [...new Set(campi.map(c => c.Estado.trim().toUpperCase()))];
+
+      geoJsonLayer = L.geoJSON(geoData, {
         style: (feature) => {
           const sigla = feature.properties.sigla.trim().toUpperCase();
-          const progresso = progressoPorEstado[sigla] ?? 0;
+          const temCampi = estadosComCampi.includes(sigla);
+          const progresso = progressoPorEstado[sigla] || 0;
+
           return {
-            fillColor: getColor(progresso),
+            fillColor: temCampi ? getColor(progresso) : "transparent",
             color: "#333",
             weight: 1,
-            fillOpacity: 0.7
+            fillOpacity: temCampi ? 0.7 : 0,
+            dashArray: temCampi ? null : "2, 5"
           };
         },
         onEachFeature: (feature, layer) => {
           const sigla = feature.properties.sigla.trim().toUpperCase();
-          const progresso = progressoPorEstado[sigla] ?? 0;
-          layer.bindPopup(`<strong>${feature.properties.nome}</strong><br>Progresso: ${progresso}%`);
+          if (progressoPorEstado[sigla] !== undefined) {
+            layer.bindPopup(`<strong>${feature.properties.nome}</strong><br>Progresso: ${progressoPorEstado[sigla]}%`);
+          }
         }
       }).addTo(map);
     })
