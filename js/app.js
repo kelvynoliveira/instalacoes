@@ -271,11 +271,6 @@ const atuaisCampus = contagemAtual[campusKey] || {};
         totalAtual += atuaisCampus[tipo] || 0;
       }
 
-      const campusKey = `${marca}|${campus}`.toUpperCase();
-const campusInfo = campi.find(c =>
-  c.Campus.trim().toUpperCase() === campusKey
-);
-
 if (!campusInfo) {
   console.warn("Campus não encontrado para:", {
     esperado: campusKey,
