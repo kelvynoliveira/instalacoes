@@ -271,7 +271,7 @@ async function calcularProgresso() {
         totalAtual += atuaisCampus[tipo] || 0;
       }
 
-      const campusInfo = campi.find(c => normalizarChave(`${c.Marca}|${c.Campus}`) === campusKey);
+      const campusInfo = campi.find(c => normalizarChave(`${c.Marca}|${c.Campus}`) === campusKeyNormalizado);
 
       if (!campusInfo) {
         console.warn("Campus não encontrado para:", campusKey);
