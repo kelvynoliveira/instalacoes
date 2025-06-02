@@ -11,7 +11,7 @@ export const campi = [
   { Marca: "UAM", Campus: "UAM|MOOCA", Cidade: "São Paulo", Estado: "SP", Latitude: -23.5506582, Longitude: -46.5956358 },
   { Marca: "UAM", Campus: "UAM|PAULISTA", Cidade: "São Paulo", Estado: "SP", Latitude: -23.5615117, Longitude: -46.6556662 },
   { Marca: "UAM", Campus: "UAM|VILAOLIMPIA", Cidade: "São Paulo", Estado: "SP", Latitude: -23.5958601, Longitude: -46.678024 },
-  { Marca: "UNIBH", Campus: "UNIBH|BURITIS", Cidade: "Belo Horizonte", Estado: "MG", Latitude: -19.9542382, Longitude: -43.968649 },
+  { Marca: "UNIBH", Campus: "UNIBH|ESTORIL", Cidade: "Belo Horizonte", Estado: "MG", Latitude: -19.9542382, Longitude: -43.968649 },
   { Marca: "UNIFG", Campus: "UNIFG|GUANAMBI", Cidade: "Guanambi", Estado: "BA", Latitude: -14.2199481, Longitude: -42.7674066},
   { Marca: "FG", Campus: "FG|PIEDADE", Cidade: "Jaboatão dos Guararapes", Estado: "PE", Latitude: -8.1740744, Longitude: -34.9259341 },
   { Marca: "FPB", Campus: "FPB|JOAOPESSOA", Cidade: "João Pessoa", Estado: "PB", Latitude: -7.11532, Longitude: -34.833233 },
@@ -21,9 +21,11 @@ export const campi = [
   { Marca: "UNA", Campus: "UNA|POUSOALEGRE", Cidade: "Pouso Alegre", Estado: "MG", Latitude: -22.2304106, Longitude: -45.937238 },
   { Marca: "UNA", Campus: "UNA|SETELAGOAS", Cidade: "Sete Lagoas", Estado: "MG", Latitude: -19.4677016, Longitude: -44.244788 },
   { Marca: "UNA", Campus: "UNA|UBERLANDIA", Cidade: "Uberlândia", Estado: "MG", Latitude: -18.936342, Longitude: -48.255128 },
+  { Marca: "UNA", Campus: "UNA|KARAIBA", Cidade: "Karaiba", Estado: "MG", Latitude: -18.9361, Longitude: -48.2875 },
   { Marca: "AGES", Campus: "AGES|IRECE", Cidade: "Irecê", Estado: "BA", Latitude: -11.3058751, Longitude: -41.8578131 },
   { Marca: "AGES", Campus: "AGES|JACOBINA", Cidade: "Jacobina", Estado: "BA", Latitude: -11.185858, Longitude: -40.5063328 },
   { Marca: "AGES", Campus: "AGES|PARIPIRANGA", Cidade: "Paripiranga", Estado: "BA", Latitude: -10.6865585, Longitude: -37.8609735 },
   { Marca: "AGES", Campus: "AGES|SENHORDOBONFIM", Cidade: "Senhor Bonfim", Estado: "BA", Latitude: -10.4561676, Longitude: -40.1903311 },
+  { Marca: "UNIFACS", Campus: "UNIFACS|TANCREDONEVES", Cidade: "Salvador", Estado: "BA", Latitude: -12.9808, Longitude: -38.4562 },
   { Marca: "HSM", Campus: "HSM|LEARNINGVILLAGE", Cidade: "São Paulo", Estado: "SP", Latitude: -23.5981, Longitude: -46.6810 }
 ];
