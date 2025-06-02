@@ -271,19 +271,18 @@ const atuaisCampus = contagemAtual[campusKey] || {};
         totalAtual += atuaisCampus[tipo] || 0;
       }
 
-      const campusInfo = campi.find(c => {
-        const match = c.Marca.trim().toUpperCase() === marca.trim().toUpperCase() &&
-                      c.Campus.trim().toUpperCase() === campus.trim().toUpperCase();
-        if (!match && c.Marca.trim().toUpperCase() === marca.trim().toUpperCase()) {
-          console.warn("Campus não encontrado para:", {
-            marca: marca.trim().toUpperCase(),
-            esperado: campus.trim().toUpperCase(),
-            existente: c.Campus.trim().toUpperCase()
-            
-          });
-        }
-        return match;
-      });
+      const campusKey = `${marca}|${campus}`.toUpperCase();
+const campusInfo = campi.find(c =>
+  c.Campus.trim().toUpperCase() === campusKey
+);
+
+if (!campusInfo) {
+  console.warn("Campus não encontrado para:", {
+    esperado: campusKey,
+    lista: campi.map(c => c.Campus.trim().toUpperCase())
+  });
+}
+
 
       if (campusInfo) {
         const estado = campusInfo.Estado.trim().toUpperCase();
