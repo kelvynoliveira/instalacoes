@@ -278,8 +278,8 @@ document.getElementById("campus-form").addEventListener("submit", async (e) => {
   const dataInstalacao = document.getElementById("data").value;
   const observacoes = document.getElementById("obs").value.trim();
     const ipAddress = document.getElementById("ip_address").value.trim();
-  const monitoramento1 = document.getElementById("zabbix").value.trim();
-  const monitoramento2 = document.getElementById("netbox").value.trim();
+  const zabbix = document.getElementById("zabbix").value.trim();
+  const netbox = document.getElementById("netbox").value.trim();
 
   if (ipAddress && !/^([0-9]{1,3}\.){3}[0-9]{1,3}$/.test(ipAddress)) {
     mostrarToast("Por favor, insira um IP válido no formato XXX.XXX.XXX.XXX", "error");
@@ -290,9 +290,13 @@ document.getElementById("campus-form").addEventListener("submit", async (e) => {
     return;
   }
 
-  if ((monitoramento1 && !isValidUrl(zabbix)) || 
-      (monitoramento2 && !isValidUrl(netbox))) {
-    mostrarToast("Por favor, insira URLs válidos para os monitoramentos", "error");
+  if (zabbix && !isValidZabbixUrl(zabbix)) {
+    mostrarToast("URL do Zabbix inválida! Deve seguir o padrão: https://noc.animaeducacao.com.br/hostinventories.php?hostid=ID", "error");
+    return;
+  }
+
+  if (netbox && !isValidNetboxUrl(netbox)) {
+    mostrarToast("URL do Netbox inválida! Deve seguir o padrão: https://netbox.ecossistemaanima.com.br/dcim/devices/ID", "error");
     return;
   }
   // Validação do MAC Address
@@ -318,10 +322,10 @@ const verificacao = await verificarLimiteEquipamento(campusCompleto, tipo);
       observacoes: observacoes,
       timestamp: new Date(),
       ip_address: ipAddress,
-      monitoramentos: {
-        primario: zabbix,
-        secundario: netbox
-      },
+monitoramentos: {
+  primario: monitoramento1,
+  secundario: monitoramento2
+},
       usuario: user.email,
       data_cadastro: new Date()
     });
@@ -336,13 +340,23 @@ const verificacao = await verificarLimiteEquipamento(campusCompleto, tipo);
   }
 });
 
-function isValidUrl(string) {
-  try {
-    new URL(string);
-    return true;
-  } catch (_) {
-    return false;
-  }
+function isValidZabbixUrl(url) {
+  const zabbixBase = 'https://noc.animaeducacao.com.br/hostinventories.php?hostid=';
+  return url.startsWith(zabbixBase) && url.length > zabbixBase.length; // Verifica se há algo após o prefixo
+}
+
+function isValidNetboxUrl(url) {
+  const netboxBase = 'https://netbox.ecossistemaanima.com.br/dcim/devices/';
+  return url.startsWith(netboxBase) && url.length > netboxBase.length; // Verifica se há algo após o prefixo
+}
+
+function isValidZabbixUrl(url) {
+  const zabbixBase = 'https://noc.animaeducacao.com.br/hostinventories.php?hostid=';
+  return (
+    url.startsWith(zabbixBase) && 
+    url.length > zabbixBase.length && 
+    /^[0-9]+$/.test(url.split('=')[1]) // Verifica se o ID é numérico
+  );
 }
 function getColor(percentual) {
   console.log(percentual);
