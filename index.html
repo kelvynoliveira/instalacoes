@@ -71,7 +71,13 @@
               <option value="switch">Switch</option>
               <option value="nobreak">Nobreak</option>
             </select>
-
+            <div class="form-group">
+             <label for="ip_address">Endereço IP do Equipamento:</label>
+            <input type="text" id="ip_address" name="ip_address" 
+           placeholder="Ex: 192.168.1.100" class="form-control"
+           pattern="^([0-9]{1,3}\.){3}[0-9]{1,3}$">
+          <small class="form-text">Formato: XXX.XXX.XXX.XXX</small>
+            </div>
             <label>MAC Address</label>
             <input type="text" id="mac_address" maxlength="17" placeholder="00:00:00:00:00:00" required>
 
@@ -83,6 +89,21 @@
               <option value="aguardando">Em Estoque</option>
               <option value="instalado">Instalado</option>
             </select>
+
+            <div class="form-group">
+    <label for="zabbix">Link do equipamento no Zabbix:</label>
+    <input type="url" id="zabbix" name="zabbix" 
+           placeholder="https://noc.animaeducacao.com.br/hostinventories.php?hostid=" 
+           class="form-control">
+  </div>
+
+  <div class="form-group">
+    <label for="netbox">Link do equipamento Netbox:</label>
+    <input type="url" id="netbox" name="netbox" 
+           placeholder="https://netbox.ecossistemaanima.com.br/dcim/devices/
+ "
+           class="form-control">
+  </div>
 
             <label>Data de instalação</label>
             <input type="date" id="data">

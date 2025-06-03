@@ -277,8 +277,22 @@ document.getElementById("campus-form").addEventListener("submit", async (e) => {
   const status = document.getElementById("status").value;
   const dataInstalacao = document.getElementById("data").value;
   const observacoes = document.getElementById("obs").value.trim();
+    const ipAddress = document.getElementById("ip_address").value.trim();
+  const monitoramento1 = document.getElementById("zabbix").value.trim();
+  const monitoramento2 = document.getElementById("netbox").value.trim();
+
+  if (ipAddress && !/^([0-9]{1,3}\.){3}[0-9]{1,3}$/.test(ipAddress)) {
+    mostrarToast("Por favor, insira um IP válido no formato XXX.XXX.XXX.XXX", "error");
+    return;
+  }
   if (!user || !user.providerData || user.providerData[0].providerId !== 'google.com') {
     mostrarToast("Apenas usuários logados com Google podem cadastrar equipamentos", "error");
+    return;
+  }
+
+  if ((monitoramento1 && !isValidUrl(zabbix)) || 
+      (monitoramento2 && !isValidUrl(netbox))) {
+    mostrarToast("Por favor, insira URLs válidos para os monitoramentos", "error");
     return;
   }
   // Validação do MAC Address
@@ -302,7 +316,14 @@ const verificacao = await verificarLimiteEquipamento(campusCompleto, tipo);
       status: status,
       data_instalacao: dataInstalacao,
       observacoes: observacoes,
-      timestamp: new Date()
+      timestamp: new Date(),
+      ip_address: ipAddress,
+      monitoramentos: {
+        primario: zabbix,
+        secundario: netbox
+      },
+      usuario: user.email,
+      data_cadastro: new Date()
     });
     await calcularProgresso().then(aplicarCoresNoMapa);
 
@@ -314,6 +335,15 @@ const verificacao = await verificarLimiteEquipamento(campusCompleto, tipo);
     mostrarToast("Erro ao salvar no Firestore!", "error");
   }
 });
+
+function isValidUrl(string) {
+  try {
+    new URL(string);
+    return true;
+  } catch (_) {
+    return false;
+  }
+}
 function getColor(percentual) {
   console.log(percentual);
   if (percentual <= 10) return '#d73027';

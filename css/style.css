@@ -505,3 +505,38 @@ main {
   opacity: 0.6;
   cursor: not-allowed;
 }
+/* Adicione ao seu style.css */
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-control {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background-color: var(--panel);
+  color: var(--text);
+  transition: border-color 0.3s;
+}
+
+.form-control:focus {
+  border-color: var(--primary);
+  outline: none;
+}
+
+.form-text {
+  display: block;
+  font-size: 0.8em;
+  color: #666;
+  margin-top: 5px;
+}
+
+/* Validação visual */
+input:invalid {
+  border-color: #ff4444;
+}
+
+input:valid {
+  border-color: #00C851;
+}
