@@ -28,49 +28,39 @@ const loginBtn = document.getElementById("login-btn");
 const logoutBtn = document.getElementById("logout-btn");
 const userInfo = document.getElementById("user-info");
 
-onAuthStateChanged(auth, async (user) => {
+onAuthStateChanged(auth, (user) => {
   const loginRequiredMsg = document.getElementById("login-required-message");
   const formFields = document.querySelectorAll("#campus-form input, #campus-form select, #campus-form button");
   
-  // Debug: verifique o estado do usuário
-  console.log("Estado do usuário:", user ? {
-    email: user.email,
-    provider: user.providerData[0]?.providerId,
-    isLogged: true
-  } : { isLogged: false });
-
-  if (user && user.providerData.some(provider => provider.providerId === 'google.com')) {
-    // Usuário logado com Google
+  // Verificação corrigida:
+  const isAuthenticated = user && user.providerData?.some(provider => provider.providerId === 'google.com');
+  
+  if (isAuthenticated) {
+    // Comportamento quando LOGADO
     loginBtn.style.display = 'none';
     logoutBtn.style.display = 'block';
     userInfo.textContent = user.displayName || user.email;
     
-    // Remova a classe hidden usando classList.remove()
-    if (loginRequiredMsg) loginRequiredMsg.classList.remove("hidden");
+    // ESCONDE a mensagem de login necessário
+    loginRequiredMsg?.classList.add("hidden");
     
-    // Habilitar formulário
+    // Habilita o formulário
     formFields.forEach(field => {
       field.disabled = false;
-      field.style.opacity = "1";
     });
-
-    // Configurações pós-login
-    configurarListenerEquipamentos();
-    await calcularProgresso().then(aplicarCoresNoMapa);
     
   } else {
-    // Usuário não logado
+    // Comportamento quando NÃO LOGADO
     loginBtn.style.display = 'block';
     logoutBtn.style.display = 'none';
     userInfo.textContent = '';
     
-    // Adicione a classe hidden usando classList.add()
-    if (loginRequiredMsg) loginRequiredMsg.classList.add("hidden");
+    // MOSTRA a mensagem de login necessário
+    loginRequiredMsg?.classList.remove("hidden");
     
-    // Desabilitar formulário
+    // Desabilita o formulário
     formFields.forEach(field => {
       field.disabled = true;
-      field.style.opacity = "0.6";
     });
   }
 });
