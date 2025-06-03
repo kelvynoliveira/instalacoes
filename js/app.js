@@ -340,11 +340,6 @@ monitoramentos: {
   }
 });
 
-function isValidZabbixUrl(url) {
-  const zabbixBase = 'https://noc.animaeducacao.com.br/hostinventories.php?hostid=';
-  return url.startsWith(zabbixBase) && url.length > zabbixBase.length; // Verifica se há algo após o prefixo
-}
-
 function isValidNetboxUrl(url) {
   const netboxBase = 'https://netbox.ecossistemaanima.com.br/dcim/devices/';
   return url.startsWith(netboxBase) && url.length > netboxBase.length; // Verifica se há algo após o prefixo
