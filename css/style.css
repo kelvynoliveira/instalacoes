@@ -492,11 +492,7 @@ main {
   display: none !important;
   visibility: hidden;
   opacity: 0;
-}
-
-.hidden {
-  display: none !important;
-  opacity: 0 !important;
+  transition: opacity 0.3s ease, visibility 0.3s ease; /* Adicione transição suave */
 }
 
 #campus-form input:disabled,
