@@ -471,3 +471,18 @@ main {
   margin-bottom: 15px;
   border-left: 4px solid #ffa000;
 }
+#login-required-message {
+  transition: all 0.3s ease;
+}
+
+.hidden {
+  display: none !important;
+  opacity: 0 !important;
+}
+
+#campus-form input:disabled,
+#campus-form select:disabled,
+#campus-form button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
