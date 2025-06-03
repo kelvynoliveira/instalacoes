@@ -175,16 +175,16 @@ campi.forEach(campus => {
     popupAnchor: [0, -30]
   });
 
- const popupContent = `
-    <strong>${campus.Marca}</strong><br>
-    ${campus.Campus}<br>
-    ${campus.Cidade} - ${campus.Estado}<br>
-    <button class="open-panel-btn" 
-            data-campus="${campus.id}"  
-            Atualizar status>
-      
-    </button>
-  `;
+const popupContent = `
+  <strong>${campus.Marca}</strong><br>
+  ${campus.Campus}<br>
+  ${campus.Cidade} - ${campus.Estado}<br>
+  <button class="open-panel-btn" 
+          data-campus="${campus.id}"
+          data-progresso="0">
+    Atualizar status
+  </button>
+`;
 
   const marker = L.marker([campus.Latitude, campus.Longitude], { icon })
     .bindPopup(popupContent);
