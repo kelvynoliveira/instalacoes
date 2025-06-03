@@ -361,12 +361,12 @@ function aplicarCoresNoMapa(progressoPorEstado) {
     .then(geoData => {
       if (geoJsonLayer) map.removeLayer(geoJsonLayer);
 
-      // Cria um array de estados que possuem campi
+      // Estados que possuem campi (em maiúsculas)
       const estadosComCampi = [...new Set(campi.map(c => c.Estado.trim().toUpperCase()))];
 
       geoJsonLayer = L.geoJSON(geoData, {
         style: (feature) => {
-          const sigla = feature.properties.sigla.trim().toUpperCase();
+          const sigla = feature.properties.sigla?.trim().toUpperCase() || "ND";
           const temCampi = estadosComCampi.includes(sigla);
           const progresso = progressoPorEstado[sigla] || 0;
 
@@ -378,16 +378,19 @@ function aplicarCoresNoMapa(progressoPorEstado) {
             dashArray: temCampi ? null : "2, 5"
           };
         },
-onEachFeature: (feature, layer) => {
-  const sigla = feature.properties.sigla?.trim().toUpperCase() || "ND";
-  const nomeEstado = feature.properties.nome || "Estado não identificado";
-  const progresso = progressoPorEstado[sigla] ?? 0; // Se não tiver progresso, mostra 0%
+        onEachFeature: (feature, layer) => {
+          const sigla = feature.properties.sigla?.trim().toUpperCase() || "ND";
+          const nomeEstado = feature.properties.name || "Estado não identificado";
+          const progresso = progressoPorEstado[sigla] ?? 0;
 
-  layer.bindPopup(`
-    <strong>${nomeEstado}</strong><br>
-    Progresso: ${progresso}%
-  `);
-}
+          // Só mostra popup se o estado tiver campi
+          if (estadosComCampi.includes(sigla)) {
+            layer.bindPopup(`
+              <strong>${nomeEstado}</strong><br>
+              Progresso: ${progresso}%
+            `);
+          }
+        }
       }).addTo(map);
     })
     .catch(error => {
