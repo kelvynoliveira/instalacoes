@@ -80,10 +80,20 @@ function normalizarChave(texto) {
     .replace(/\s+/g, "").toUpperCase();
 }
 
-function abrirPainel(campusCompleto, progresso) {
+function abrirPainel(campusKey, progresso) {
+  // Encontra o campus no array `campi` usando o ID completo
+  const campusInfo = campi.find(c => c.id === campusKey);
+  if (!campusInfo) {
+    mostrarToast("Campus não encontrado no banco de dados!", "error");
+    return;
+  }
+
+  // Atualiza o painel com os dados corretos
   document.getElementById("side-panel").classList.remove("hidden");
-  document.getElementById("panel-title").innerText = `${campusCompleto} (${progresso}% concluído)`;
-  document.getElementById("campus-form").setAttribute("data-campus", campusCompleto);
+  document.getElementById("panel-title").innerText = `${campusInfo.Marca} - ${campusInfo.Campus} (${progresso}% concluído)`;
+  
+  // Passa o ID completo para o formulário (ex: "FG|PIEDADE")
+  document.getElementById("campus-form").setAttribute("data-campus", campusKey);
 }
 
 window.abrirPainel = abrirPainel;
@@ -165,12 +175,12 @@ campi.forEach(campus => {
     popupAnchor: [0, -30]
   });
 
-  const popupContent = `
+ const popupContent = `
     <strong>${campus.Marca}</strong><br>
     ${campus.Campus}<br>
     ${campus.Cidade} - ${campus.Estado}<br>
     <button class="open-panel-btn" 
-            data-campus="${campus.Campus}"
+            data-campus="${campus.id}"  <!-- Agora usa campus.id (ex: "FG|PIEDADE") -->
             data-progresso="0">
       Atualizar status
     </button>
@@ -229,7 +239,7 @@ document.getElementById("campus-form").addEventListener("submit", async (e) => {
   e.preventDefault();
 
   const form = e.target;
-  const campusKey = form.getAttribute("data-campus");
+  const campusCompleto = form.getAttribute("data-campus"); // Agora já recebe "MARCA|CAMPUS"
   const tipo = document.getElementById("tipo").value;
   const mac = document.getElementById("mac_address").value.trim();
   const serial = document.getElementById("serial_number").value.trim();
@@ -237,6 +247,7 @@ document.getElementById("campus-form").addEventListener("submit", async (e) => {
   const dataInstalacao = document.getElementById("data").value;
   const observacoes = document.getElementById("obs").value.trim();
 
+  // Validação do MAC Address
   if (mac.length !== 17 || !/^([A-F0-9]{2}:){5}[A-F0-9]{2}$/.test(mac)) {
     document.getElementById("mac_address").classList.add("invalid");
     mostrarToast("Por favor, insira um MAC Address válido!", "error");
@@ -244,8 +255,9 @@ document.getElementById("campus-form").addEventListener("submit", async (e) => {
   }
 
   try {
+    // Salva no Firebase com o campus no formato "MARCA|CAMPUS"
     await addDoc(collection(db, "equipamentos"), {
-      campus: campusKey,
+      campus: campusCompleto, // Ex: "FG|PIEDADE"
       tipo: tipo,
       mac_address: mac,
       serial_number: serial,
