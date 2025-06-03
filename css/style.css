@@ -536,3 +536,63 @@ input:invalid {
 input:valid {
   border-color: #00C851;
 }
+
+/* Estilos do Resumo */
+.resumo-container {
+  background: var(--panel);
+  padding: 15px;
+  border-radius: 8px;
+  margin-top: 20px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.resumo-container h3 {
+  margin: 0 0 15px 0;
+  color: var(--primary);
+  font-size: 1.1rem;
+  border-bottom: 1px solid var(--primary);
+  padding-bottom: 5px;
+}
+
+.resumo-item {
+  margin-bottom: 15px;
+}
+
+.resumo-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.resumo-header i {
+  width: 20px;
+  text-align: center;
+}
+
+.progress-bar {
+  height: 8px;
+  background: #e0e0e0;
+  border-radius: 4px;
+  overflow: hidden;
+  margin: 5px 0;
+}
+
+.progress {
+  height: 100%;
+  background: var(--primary);
+  border-radius: 4px;
+  transition: width 0.5s ease;
+}
+
+.resumo-dados {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.resumo-dados span {
+  font-size: 0.8rem;
+  white-space: nowrap;
+}

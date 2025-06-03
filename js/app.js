@@ -45,8 +45,7 @@ onAuthStateChanged(auth, (user) => {
     formFields.forEach(field => {
       field.disabled = false;
     });
-
-    // *** Adicione estas linhas ***
+    calcularResumoNacional();
     configurarListenerEquipamentos(); // Inicia o listener do Firebase
     calcularProgresso()              // Força a atualização do mapa
       .then(aplicarCoresNoMapa)
@@ -76,6 +75,7 @@ function configurarListenerEquipamentos() {
   if (unsubscribeEquipamentos) unsubscribeEquipamentos();
   
   unsubscribeEquipamentos = onSnapshot(collection(db, "equipamentos"), (snapshot) => {
+   calcularResumoNacional();
     calcularProgresso()
       .then(aplicarCoresNoMapa)
       .catch(error => console.error("Erro ao atualizar mapa:", error));
@@ -124,6 +124,56 @@ if (!campusInfo) {
   document.getElementById("side-panel").classList.remove("hidden");
   document.getElementById("panel-title").innerText = `${campusInfo.Marca} - ${campusInfo.Campus} (${progressoReal}% concluído)`;
   document.getElementById("campus-form").setAttribute("data-campus", campusKey);
+}
+// Função para calcular totais
+async function calcularResumoNacional() {
+  try {
+    // Busca todos os equipamentos
+    const snapshot = await getDocs(collection(db, "equipamentos"));
+    
+    // Calcula metas totais
+    let totalSwitches = 0;
+    let totalNobreaks = 0;
+    
+    Object.values(metas).forEach(campus => {
+      totalSwitches += campus.switch || 0;
+      totalNobreaks += campus.nobreak || 0;
+    });
+
+    // Conta instalados
+    let instaladosSwitches = 0;
+    let instaladosNobreaks = 0;
+    
+    snapshot.forEach(doc => {
+      const tipo = doc.data().tipo.toLowerCase();
+      if (tipo === 'switch') instaladosSwitches++;
+      if (tipo === 'nobreak') instaladosNobreaks++;
+    });
+
+    // Atualiza a UI
+    atualizarUIResumo({
+      switches: { instalados: instaladosSwitches, total: totalSwitches },
+      nobreaks: { instalados: instaladosNobreaks, total: totalNobreaks }
+    });
+    
+  } catch (error) {
+    console.error("Erro ao calcular resumo:", error);
+  }
+}
+
+// Função para atualizar a interface
+function atualizarUIResumo(dados) {
+  // Switches
+  const switchPercent = (dados.switches.instalados / dados.switches.total) * 100 || 0;
+  document.getElementById('switch-progress').style.width = `${switchPercent}%`;
+  document.getElementById('switch-text').textContent = 
+    `${dados.switches.instalados}/${dados.switches.total} (${Math.round(switchPercent)}%)`;
+
+  // Nobreaks
+  const nobreakPercent = (dados.nobreaks.instalados / dados.nobreaks.total) * 100 || 0;
+  document.getElementById('nobreak-progress').style.width = `${nobreakPercent}%`;
+  document.getElementById('nobreak-text').textContent = 
+    `${dados.nobreaks.instalados}/${dados.nobreaks.total} (${Math.round(nobreakPercent)}%)`;
 }
 
 window.abrirPainel = abrirPainel;
