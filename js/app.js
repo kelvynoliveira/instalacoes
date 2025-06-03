@@ -28,14 +28,36 @@ const logoutBtn = document.getElementById("logout-btn");
 const userInfo = document.getElementById("user-info");
 
 onAuthStateChanged(auth, (user) => {
+    const loginRequiredMsg = document.getElementById("login-required-message");
+  const formFields = document.querySelectorAll("#campus-form input, #campus-form select, #campus-form button");
   if (user) {
-    loginBtn.style.display = 'none'; // Esconde botão de login
-    logoutBtn.style.display = 'block'; // Mostra botão de logout
-    userInfo.textContent = user.displayName || user.email; // Mostra nome/email
+    // Usuário logado
+    loginBtn.style.display = 'none';
+    logoutBtn.style.display = 'block';
+    userInfo.textContent = user.displayName || user.email;
+    loginRequiredMsg.classList.add("hidden");
+    
+    // Habilitar formulário
+    formFields.forEach(field => {
+      field.disabled = false;
+    });
+    
+    // Verificar se é login Google
+    if (user.providerData && user.providerData[0].providerId === 'google.com') {
+      configurarListenerEquipamentos();
+      calcularProgresso().then(aplicarCoresNoMapa);
+    }
   } else {
-    loginBtn.style.display = 'block'; // Mostra botão de login
-    logoutBtn.style.display = 'none'; // Esconde botão de logout
+    // Usuário não logado
+    loginBtn.style.display = 'block';
+    logoutBtn.style.display = 'none';
     userInfo.textContent = '';
+    loginRequiredMsg.classList.remove("hidden");
+    
+    // Desabilitar formulário
+    formFields.forEach(field => {
+      field.disabled = true;
+    });
   }
 });
 
@@ -242,7 +264,7 @@ function mostrarToast(mensagem, tipo = "success") {
 
 document.getElementById("campus-form").addEventListener("submit", async (e) => {
   e.preventDefault();
-
+const user = auth.currentUser;
   const form = e.target;
   const campusCompleto = form.getAttribute("data-campus"); // Agora já recebe "MARCA|CAMPUS"
   const tipo = document.getElementById("tipo").value;
@@ -251,7 +273,10 @@ document.getElementById("campus-form").addEventListener("submit", async (e) => {
   const status = document.getElementById("status").value;
   const dataInstalacao = document.getElementById("data").value;
   const observacoes = document.getElementById("obs").value.trim();
-
+  if (!user || !user.providerData || user.providerData[0].providerId !== 'google.com') {
+    mostrarToast("Apenas usuários logados com Google podem cadastrar equipamentos", "error");
+    return;
+  }
   // Validação do MAC Address
   if (mac.length !== 17 || !/^([A-F0-9]{2}:){5}[A-F0-9]{2}$/.test(mac)) {
     document.getElementById("mac_address").classList.add("invalid");
