@@ -2,6 +2,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
 import { getAuth, signInWithPopup, GoogleAuthProvider, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
 import { getFirestore, getDocs, collection, addDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
 import { campi } from "./campi.js";
 import { metas } from "./metas.js";
 
@@ -26,41 +27,45 @@ const loginBtn = document.getElementById("login-btn");
 const logoutBtn = document.getElementById("logout-btn");
 const userInfo = document.getElementById("user-info");
 
-function configurarListenerEquipamentos() {
-  if (unsubscribeEquipamentos) {
-    unsubscribeEquipamentos();
-    unsubscribeEquipamentos = null;
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    loginBtn.style.display = 'none'; // Esconde botão de login
+    logoutBtn.style.display = 'block'; // Mostra botão de logout
+    userInfo.textContent = user.displayName || user.email; // Mostra nome/email
+  } else {
+    loginBtn.style.display = 'block'; // Mostra botão de login
+    logoutBtn.style.display = 'none'; // Esconde botão de logout
+    userInfo.textContent = '';
   }
+});
 
-  // Adicione um debounce para evitar múltiplas chamadas rápidas
+function configurarListenerEquipamentos() {
+  if (unsubscribeEquipamentos) unsubscribeEquipamentos();
+
+  // Versão com debounce otimizado (300ms)
   let timeout;
   unsubscribeEquipamentos = onSnapshot(collection(db, "equipamentos"), (snapshot) => {
     clearTimeout(timeout);
     timeout = setTimeout(() => {
-      if (!snapshot.metadata.hasPendingWrites) {
-        calcularProgresso()
-          .then(aplicarCoresNoMapa)
-          .catch(error => console.error("Erro ao atualizar mapa:", error));
-      }
-    }, 300); // Aguarda 300ms antes de atualizar
+      calcularProgresso()
+        .then(aplicarCoresNoMapa)
+        .catch(error => {
+          console.error("Erro ao atualizar mapa:", error);
+          mostrarToast("Erro ao atualizar o mapa", "error");
+        });
+    }, 300);
   });
 }
 
 loginBtn.onclick = () => {
   signInWithPopup(auth, provider)
     .then(() => {
+      configurarListenerEquipamentos(); // Adiciona o listener após login
       calcularProgresso()
         .then(aplicarCoresNoMapa)
-        .catch(error => {
-          console.error("Erro ao carregar progresso inicial:", error);
-          mostrarToast("Erro ao carregar dados iniciais", "error");
-        });
-      configurarListenerEquipamentos();
+        .catch(error => mostrarToast("Erro ao carregar dados iniciais", "error"));
     })
-    .catch(error => {
-      console.error("Erro no login:", error);
-      mostrarToast("Falha no login", "error");
-    });
+    .catch(error => mostrarToast("Falha no login", "error"));
 };
 
 logoutBtn.onclick = () => {
@@ -175,16 +180,16 @@ campi.forEach(campus => {
     popupAnchor: [0, -30]
   });
 
-const popupContent = `
-  <strong>${campus.Marca}</strong><br>
-  ${campus.Campus}<br>
-  ${campus.Cidade} - ${campus.Estado}<br>
-  <button class="open-panel-btn" 
-          data-campus="${campus.id}"
-          data-progresso="0">
-    Atualizar status
-  </button>
-`;
+  const popupContent = `
+    <strong>${campus.Marca}</strong><br>
+    ${campus.Campus}<br>
+    ${campus.Cidade} - ${campus.Estado}<br>
+    <button class="open-panel-btn" 
+            data-campus="${campus.id}"
+            data-progresso="0">
+      Atualizar status
+    </button>
+  `;
 
   const marker = L.marker([campus.Latitude, campus.Longitude], { icon })
     .bindPopup(popupContent);
@@ -373,12 +378,16 @@ function aplicarCoresNoMapa(progressoPorEstado) {
             dashArray: temCampi ? null : "2, 5"
           };
         },
-        onEachFeature: (feature, layer) => {
-          const sigla = feature.properties.sigla.trim().toUpperCase();
-          if (progressoPorEstado[sigla] !== undefined) {
-            layer.bindPopup(`<strong>${feature.properties.nome}</strong><br>Progresso: ${progressoPorEstado[sigla]}%`);
-          }
-        }
+onEachFeature: (feature, layer) => {
+  const sigla = feature.properties.sigla?.trim().toUpperCase() || "ND";
+  const nomeEstado = feature.properties.nome || "Estado não identificado";
+  const progresso = progressoPorEstado[sigla] ?? 0; // Se não tiver progresso, mostra 0%
+
+  layer.bindPopup(`
+    <strong>${nomeEstado}</strong><br>
+    Progresso: ${progresso}%
+  `);
+}
       }).addTo(map);
     })
     .catch(error => {
