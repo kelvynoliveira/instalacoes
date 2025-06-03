@@ -323,8 +323,8 @@ const verificacao = await verificarLimiteEquipamento(campusCompleto, tipo);
       timestamp: new Date(),
       ip_address: ipAddress,
 monitoramentos: {
-  primario: monitoramento1,
-  secundario: monitoramento2
+  primario: zabbix,
+  secundario: netbox
 },
       usuario: user.email,
       data_cadastro: new Date()
