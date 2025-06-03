@@ -32,7 +32,6 @@ onAuthStateChanged(auth, (user) => {
   const loginRequiredMsg = document.getElementById("login-required-message");
   const formFields = document.querySelectorAll("#campus-form input, #campus-form select, #campus-form button");
   
-  // Verificação corrigida:
   const isAuthenticated = user && user.providerData?.some(provider => provider.providerId === 'google.com');
   
   if (isAuthenticated) {
@@ -40,46 +39,46 @@ onAuthStateChanged(auth, (user) => {
     loginBtn.style.display = 'none';
     logoutBtn.style.display = 'block';
     userInfo.textContent = user.displayName || user.email;
-    
-    // ESCONDE a mensagem de login necessário
     loginRequiredMsg?.classList.add("hidden");
     
     // Habilita o formulário
     formFields.forEach(field => {
       field.disabled = false;
     });
+
+    // *** Adicione estas linhas ***
+    configurarListenerEquipamentos(); // Inicia o listener do Firebase
+    calcularProgresso()              // Força a atualização do mapa
+      .then(aplicarCoresNoMapa)
+      .catch(error => console.error("Erro ao carregar mapa:", error));
     
   } else {
     // Comportamento quando NÃO LOGADO
     loginBtn.style.display = 'block';
     logoutBtn.style.display = 'none';
     userInfo.textContent = '';
-    
-    // MOSTRA a mensagem de login necessário
     loginRequiredMsg?.classList.remove("hidden");
     
     // Desabilita o formulário
     formFields.forEach(field => {
       field.disabled = true;
     });
+
+    // Remove o listener se existir
+    if (unsubscribeEquipamentos) {
+      unsubscribeEquipamentos();
+      unsubscribeEquipamentos = null;
+    }
   }
 });
 
 function configurarListenerEquipamentos() {
   if (unsubscribeEquipamentos) unsubscribeEquipamentos();
-
-  // Versão com debounce otimizado (300ms)
-  let timeout;
+  
   unsubscribeEquipamentos = onSnapshot(collection(db, "equipamentos"), (snapshot) => {
-    clearTimeout(timeout);
-    timeout = setTimeout(() => {
-      calcularProgresso()
-        .then(aplicarCoresNoMapa)
-        .catch(error => {
-          console.error("Erro ao atualizar mapa:", error);
-          mostrarToast("Erro ao atualizar o mapa", "error");
-        });
-    }, 300);
+    calcularProgresso()
+      .then(aplicarCoresNoMapa)
+      .catch(error => console.error("Erro ao atualizar mapa:", error));
   });
 }
 
@@ -96,14 +95,14 @@ loginBtn.onclick = () => {
 
 logoutBtn.onclick = () => {
   if (unsubscribeEquipamentos) {
-    unsubscribeEquipamentos();
+    unsubscribeEquipamentos(); // Remove o listener
     unsubscribeEquipamentos = null;
   }
   if (geoJsonLayer) {
-    map.removeLayer(geoJsonLayer);
+    map.removeLayer(geoJsonLayer); // Limpa o mapa
     geoJsonLayer = null;
   }
-  signOut(auth);
+  signOut(auth); // Desloga o usuário
 };
 function normalizarChave(texto) {
   return texto
