@@ -30,34 +30,14 @@ const userInfo = document.getElementById("user-info");
 onAuthStateChanged(auth, (user) => {
     const loginRequiredMsg = document.getElementById("login-required-message");
   const formFields = document.querySelectorAll("#campus-form input, #campus-form select, #campus-form button");
-  if (user) {
-    // Usuário logado
-    loginBtn.style.display = 'none';
-    logoutBtn.style.display = 'block';
-    userInfo.textContent = user.displayName || user.email;
-    loginRequiredMsg.classList.add("hidden");
-    
-    // Habilitar formulário
-    formFields.forEach(field => {
-      field.disabled = false;
-    });
-    
-    // Verificar se é login Google
-    if (user.providerData && user.providerData[0].providerId === 'google.com') {
-      configurarListenerEquipamentos();
-      calcularProgresso().then(aplicarCoresNoMapa);
-    }
+  if (user && user.providerData.some(provider => provider.providerId === 'google.com')) {
+    // Usuário logado com Google
+    loginRequiredMsg?.classList.add("hidden");
+    formFields.forEach(field => field.disabled = false);
   } else {
-    // Usuário não logado
-    loginBtn.style.display = 'block';
-    logoutBtn.style.display = 'none';
-    userInfo.textContent = '';
-    loginRequiredMsg.classList.remove("hidden");
-    
-    // Desabilitar formulário
-    formFields.forEach(field => {
-      field.disabled = true;
-    });
+    // Usuário não logado ou logado com outro método
+    loginRequiredMsg?.classList.remove("hidden");
+    formFields.forEach(field => field.disabled = true);
   }
 });
 
@@ -107,19 +87,19 @@ function normalizarChave(texto) {
     .replace(/\s+/g, "").toUpperCase();
 }
 
-function abrirPainel(campusKey, progresso) {
-  // Encontra o campus no array `campi` usando o ID completo
+async function abrirPainel(campusKey) {
+const progressoAtual = await calcularProgresso();
   const campusInfo = campi.find(c => c.id === campusKey);
-  if (!campusInfo) {
-    mostrarToast("Campus não encontrado no banco de dados!", "error");
+if (!campusInfo) {
+    mostrarToast("Campus não encontrado!", "error");
     return;
   }
 
-  // Atualiza o painel com os dados corretos
+  const estado = campusInfo.Estado.trim().toUpperCase();
+  const progressoReal = progressoAtual[estado] || 0;
+
   document.getElementById("side-panel").classList.remove("hidden");
-  document.getElementById("panel-title").innerText = `${campusInfo.Marca} - ${campusInfo.Campus} (${progresso}% concluído)`;
-  
-  // Passa o ID completo para o formulário (ex: "FG|PIEDADE")
+  document.getElementById("panel-title").innerText = `${campusInfo.Marca} - ${campusInfo.Campus} (${progressoReal}% concluído)`;
   document.getElementById("campus-form").setAttribute("data-campus", campusKey);
 }
 
