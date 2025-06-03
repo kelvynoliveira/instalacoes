@@ -3,6 +3,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebas
 import { getAuth, signInWithPopup, GoogleAuthProvider, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
 import { getFirestore, getDocs, collection, addDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+import { query, where } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 import { campi } from "./campi.js";
 import { metas } from "./metas.js";
 
@@ -203,7 +204,7 @@ campi.forEach(campus => {
     const btn = popupNode.querySelector(".open-panel-btn");
     if (btn) {
       btn.addEventListener("click", () => {
-        abrirPainel(btn.dataset.campus, btn.dataset.progresso);
+        abrirPainel(btn.dataset.campus);
       });
     }
   });
@@ -244,9 +245,9 @@ function mostrarToast(mensagem, tipo = "success") {
 
 document.getElementById("campus-form").addEventListener("submit", async (e) => {
   e.preventDefault();
-const user = auth.currentUser;
+  const user = auth.currentUser;
   const form = e.target;
-  const campusCompleto = form.getAttribute("data-campus"); // Agora já recebe "MARCA|CAMPUS"
+  const campusCompleto = form.getAttribute("data-campus");
   const tipo = document.getElementById("tipo").value;
   const mac = document.getElementById("mac_address").value.trim();
   const serial = document.getElementById("serial_number").value.trim();
@@ -263,7 +264,11 @@ const user = auth.currentUser;
     mostrarToast("Por favor, insira um MAC Address válido!", "error");
     return;
   }
-
+const verificacao = await verificarLimiteEquipamento(campusCompleto, tipo);
+  if (!verificacao.valido) {
+    mostrarToast(verificacao.mensagem, "error");
+    return;
+  }
   try {
     // Salva no Firebase com o campus no formato "MARCA|CAMPUS"
     await addDoc(collection(db, "equipamentos"), {
@@ -276,6 +281,7 @@ const user = auth.currentUser;
       observacoes: observacoes,
       timestamp: new Date()
     });
+    await calcularProgresso().then(aplicarCoresNoMapa);
 
     mostrarToast("Equipamento salvo com sucesso!");
     form.reset();
@@ -305,6 +311,7 @@ async function calcularProgresso() {
     const campusKey = normalizarChave(data.campus || "");
     const tipo = (data.tipo || "").toLowerCase();
     if (!campusKey || !tipo) return;
+    
     contagemAtual[campusKey] ??= {};
     contagemAtual[campusKey][tipo] ??= 0;
     contagemAtual[campusKey][tipo]++;
@@ -319,24 +326,19 @@ async function calcularProgresso() {
     const campusKeyNormalizado = normalizarChave(campusKey);
     const atuaisCampus = contagemAtual[campusKeyNormalizado] || {};
 
-    // Correção: Busca pelo ID já normalizado (não precisa normalizar novamente)
     const campusInfo = campi.find(c => c.id === campusKeyNormalizado);
-
-    if (!campusInfo) {
-      console.warn("Campus não encontrado:", { 
-        campusKeyOriginal: campusKey,
-        campusKeyNormalizado,
-        listaCampi: campi.map(c => c.id) // Mostra os IDs reais para comparação
-      });
-      continue;
-    }
+    if (!campusInfo) continue;
 
     let totalMeta = 0;
     let totalAtual = 0;
 
+    // Calcula para cada tipo de equipamento separadamente
     for (const tipo in metasCampus) {
-      totalMeta += metasCampus[tipo];
-      totalAtual += atuaisCampus[tipo] || 0;
+      const metaTipo = metasCampus[tipo] || 0;
+      const atualTipo = atuaisCampus[tipo] || 0;
+      
+      totalMeta += metaTipo;
+      totalAtual += Math.min(atualTipo, metaTipo); // Não permite exceder a meta por tipo
     }
 
     const estado = campusInfo.Estado.trim().toUpperCase();
@@ -352,8 +354,48 @@ async function calcularProgresso() {
     progressoPorEstado[estado] = Math.round(progressoSoma[estado] / progressoCount[estado]);
   }
 
-  console.table(progressoPorEstado);
+  console.log("Progresso detalhado:", { metas, contagemAtual, progressoPorEstado });
   return progressoPorEstado;
+}
+
+async function verificarLimiteEquipamento(campus, tipoEquipamento) {
+  try {
+    // 1. Normaliza as chaves
+    const campusKey = normalizarChave(campus);
+    tipoEquipamento = tipoEquipamento.toLowerCase();
+    
+    // 2. Busca a meta para este tipo de equipamento no campus
+    const meta = metas[campusKey]?.[tipoEquipamento] || 0;
+    if (meta === 0) return { valido: true }; // Se não há meta definida, permite cadastro
+
+    // 3. Conta equipamentos existentes deste tipo no campus
+    const querySnapshot = await getDocs(
+      query(
+        collection(db, "equipamentos"),
+        where("campus", "==", campus),
+        where("tipo", "==", tipoEquipamento)
+      )
+    );
+
+    const quantidadeAtual = querySnapshot.size;
+
+    // 4. Verifica se ainda pode cadastrar
+    if (quantidadeAtual >= meta) {
+      return {
+        valido: false,
+        mensagem: `Limite de ${tipoEquipamento}s atingido para este campus (${quantidadeAtual}/${meta})`
+      };
+    }
+
+    return { valido: true };
+
+  } catch (error) {
+    console.error("Erro na verificação de limites:", error);
+    return {
+      valido: false,
+      mensagem: "Erro ao verificar limites de equipamentos"
+    };
+  }
 }
 
 // Aplicar cores no mapa conforme o progresso
