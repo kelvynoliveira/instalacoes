@@ -135,15 +135,6 @@ export const campi = [
     Longitude: -34.9259341
   },
   {
-    id: "FPB|JOAOPESSOA",
-    Marca: "FPB",
-    Campus: "JOAOPESSOA",
-    Cidade: "João Pessoa",
-    Estado: "PB",
-    Latitude: -7.11532,
-    Longitude: -34.833233
-  },
-  {
     id: "UNA|BETIM",
     Marca: "UNA",
     Campus: "BETIM",

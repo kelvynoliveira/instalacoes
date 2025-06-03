@@ -180,8 +180,7 @@ campi.forEach(campus => {
     ${campus.Campus}<br>
     ${campus.Cidade} - ${campus.Estado}<br>
     <button class="open-panel-btn" 
-            data-campus="${campus.id}"  <!-- Agora usa campus.id (ex: "FG|PIEDADE") -->
-            data-progresso="0">
+            data-campus="${campus.id}" 
       Atualizar status
     </button>
   `;
