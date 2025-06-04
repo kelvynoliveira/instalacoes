@@ -31,6 +31,7 @@ const userInfo = document.getElementById("user-info");
 onAuthStateChanged(auth, (user) => {
   const loginRequiredMsg = document.getElementById("login-required-message");
   const formFields = document.querySelectorAll("#campus-form input, #campus-form select, #campus-form button");
+  const progressContainers = document.querySelectorAll(".resumo-container, .filter-control");
   
   const isAuthenticated = user && user.providerData?.some(provider => provider.providerId === 'google.com');
   
@@ -41,13 +42,19 @@ onAuthStateChanged(auth, (user) => {
     userInfo.textContent = user.displayName || user.email;
     loginRequiredMsg?.classList.add("hidden");
     
+    // Mostra os containers de progresso
+    progressContainers.forEach(container => {
+      container.style.display = 'block';
+    });
+    
     // Habilita o formulário
     formFields.forEach(field => {
       field.disabled = false;
     });
+    
     calcularResumoNacional();
-    configurarListenerEquipamentos(); // Inicia o listener do Firebase
-    calcularProgresso()              // Força a atualização do mapa
+    configurarListenerEquipamentos();
+    calcularProgresso()
       .then(aplicarCoresNoMapa)
       .catch(error => console.error("Erro ao carregar mapa:", error));
     
@@ -58,12 +65,16 @@ onAuthStateChanged(auth, (user) => {
     userInfo.textContent = '';
     loginRequiredMsg?.classList.remove("hidden");
     
+    // Oculta os containers de progresso
+    progressContainers.forEach(container => {
+      container.style.display = 'none';
+    });
+    
     // Desabilita o formulário
     formFields.forEach(field => {
       field.disabled = true;
     });
 
-    // Remove o listener se existir
     if (unsubscribeEquipamentos) {
       unsubscribeEquipamentos();
       unsubscribeEquipamentos = null;
