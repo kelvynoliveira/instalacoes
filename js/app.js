@@ -191,6 +191,7 @@ async function calcularResumoNacional() {
 
 // Função para popular o seletor de marcas
 function popularFiltroMarcas() {
+  
   const marcaFilter = document.getElementById("marca-filter");
   if (!marcaFilter) return;
 
@@ -200,7 +201,7 @@ function popularFiltroMarcas() {
   }
 
   // Obtém todas as marcas únicas dos campi
-  const marcasUnicas = [...new Set(campi.map(c => c.Marca))];
+  const marcasUnicas = [...new Set(campi.map(c => c.Marca))].sort();
   
   marcasUnicas.forEach(marca => {
     const option = document.createElement("option");
@@ -220,10 +221,24 @@ async function calcularProgressoPorMarca(marca = null) {
   // Inicializa estrutura para todas as marcas
   campi.forEach(campus => {
     const marcaKey = campus.Marca;
-    totaisPorMarca[marcaKey] = {
-      switches: { instalados: 0, meta: 0 },
-      nobreaks: { instalados: 0, meta: 0 }
-    };
+    const campusKey = normalizarChave(campus.id);
+    const metaCampus = metas[campusKey] || {};
+    
+    // Só adiciona a marca se tiver metas definidas
+    if (metaCampus.switch > 0 || metaCampus.nobreak > 0) {
+      totaisPorMarca[marcaKey] ??= {
+        switches: { instalados: 0, meta: 0 },
+        nobreaks: { instalados: 0, meta: 0 }
+      };
+      
+      // Soma as metas apenas se existirem
+      if (metaCampus.switch > 0) {
+        totaisPorMarca[marcaKey].switches.meta += metaCampus.switch;
+      }
+      if (metaCampus.nobreak > 0) {
+        totaisPorMarca[marcaKey].nobreaks.meta += metaCampus.nobreak;
+      }
+    }
   });
 
   // Calcula metas totais por marca
@@ -267,40 +282,42 @@ function atualizarUIPorMarca(dados) {
   const container = document.getElementById("marca-progress-container");
   if (!container) return;
 
-  container.innerHTML = '<h3>Progresso da Marca</h3>'; // Título fixo
+  container.innerHTML = '<h3>Progresso da Marca</h3>';
 
   Object.entries(dados).forEach(([marca, totais]) => {
     const marcaDiv = document.createElement("div");
-    marcaDiv.className = "resumo-item";
+    marcaDiv.className = "marca-progress";
+    marcaDiv.innerHTML = `<h4>${marca}</h4>`;
     
-    const switchPercent = Math.round((totais.switches.instalados / totais.switches.meta) * 100) || 0;
-    const nobreakPercent = Math.round((totais.nobreaks.instalados / totais.nobreaks.meta) * 100) || 0;
-    
-    marcaDiv.innerHTML = `
-      <div class="resumo-header">
-        <i class="fas fa-building"></i>
-        <span>${marca}</span>
-      </div>
-      <div class="resumo-dados">
-        <span>Switches:</span>
-        <div class="progress-bar">
-          <div class="progress" style="width: ${switchPercent}%"></div>
+    // Só mostra switches se houver meta
+    if (totais.switches.meta > 0) {
+      const switchPercent = Math.round((totais.switches.instalados / totais.switches.meta) * 100);
+      marcaDiv.innerHTML += `
+        <div class="progress-item">
+          <span>Switches:</span>
+          <div class="progress-bar">
+            <div class="progress" style="width: ${switchPercent}%"></div>
+          </div>
+          <span>${totais.switches.instalados}/${totais.switches.meta} (${switchPercent}%)</span>
         </div>
-        <span>${totais.switches.instalados}/${totais.switches.meta} (${switchPercent}%)</span>
-      </div>
-      <div class="resumo-dados">
-        <span>Nobreaks:</span>
-        <div class="progress-bar">
-          <div class="progress" style="width: ${nobreakPercent}%"></div>
-        </div>
-        <span>${totais.nobreaks.instalados}/${totais.nobreaks.meta} (${nobreakPercent}%)</span>
-      </div>
-    `;
+      `;
+    }
     
-    container.appendChild(marcaDiv);
-  });
+    // Só mostra nobreaks se houver meta
+    if (totais.nobreaks.meta > 0) {
+      const nobreakPercent = Math.round((totais.nobreaks.instalados / totais.nobreaks.meta) * 100);
+      marcaDiv.innerHTML += `
+        <div class="progress-item">
+          <span>Nobreaks:</span>
+          <div class="progress-bar">
+            <div class="progress" style="width: ${nobreakPercent}%"></div>
+          </div>
+          <span>${totais.nobreaks.instalados}/${totais.nobreaks.meta} (${nobreakPercent}%)</span>
+        </div>
+      `;
+    }
+});
 }
-
 // Função para atualizar a interface
 function atualizarUIResumo(dados) {
   // Switches
@@ -611,15 +628,24 @@ async function calcularProgresso() {
 
 async function verificarLimiteEquipamento(campus, tipoEquipamento) {
   try {
-    // 1. Normaliza as chaves
     const campusKey = normalizarChave(campus);
     tipoEquipamento = tipoEquipamento.toLowerCase();
     
-    // 2. Busca a meta para este tipo de equipamento no campus
     const meta = metas[campusKey]?.[tipoEquipamento] || 0;
-    if (meta === 0) return { valido: true }; // Se não há meta definida, permite cadastro
-
-    // 3. Conta equipamentos existentes deste tipo no campus
+    
+    // Se não há meta definida, impede o cadastro
+    if (meta === undefined) { // Se a chave não existe no objeto metas
+  return {
+    valido: false,
+    mensagem: `Tipo de equipamento não configurado para este campus`
+  };
+}
+    if (meta === 0) {
+      return {
+        valido: false,
+        mensagem: `Não há meta definida para ${tipoEquipamento}s neste campus`
+      };
+    }
     const querySnapshot = await getDocs(
       query(
         collection(db, "equipamentos"),
