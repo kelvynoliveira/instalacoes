@@ -219,21 +219,20 @@ async function calcularProgressoPorMarca(marca = null) {
   // Objeto para armazenar totais por marca
   const totaisPorMarca = {};
   
-  // Inicializa estrutura para todas as marcas
+  // Inicializa estrutura para todas as marcas com base nas metas
   campi.forEach(campus => {
     const marcaKey = campus.Marca;
     const campusKey = normalizarChave(campus.id);
     const metaCampus = metas[campusKey] || {};
     
     // Só adiciona a marca se tiver metas definidas
-    
     if (metaCampus.switch > 0 || metaCampus.nobreak > 0) {
       totaisPorMarca[marcaKey] ??= {
         switches: { instalados: 0, meta: 0 },
         nobreaks: { instalados: 0, meta: 0 }
       };
       
-      // Soma as metas apenas se existirem
+      // Soma as metas apenas uma vez
       if (metaCampus.switch > 0) {
         totaisPorMarca[marcaKey].switches.meta += metaCampus.switch;
       }
@@ -241,23 +240,6 @@ async function calcularProgressoPorMarca(marca = null) {
         totaisPorMarca[marcaKey].nobreaks.meta += metaCampus.nobreak;
       }
     }
-    
-    if (marca && marca !== "todas") {
-    return totaisPorMarca[marca] ? { [marca]: totaisPorMarca[marca] } : {};
-  }
-  
-  return totaisPorMarca;
-  });
-  
-
-  // Calcula metas totais por marca
-  Object.entries(metas).forEach(([campusKey, meta]) => {
-    const campusInfo = campi.find(c => c.id === normalizarChave(campusKey));
-    if (!campusInfo) return;
-    
-    const marca = campusInfo.Marca;
-    totaisPorMarca[marca].switches.meta += meta.switch || 0;
-    totaisPorMarca[marca].nobreaks.meta += meta.nobreak || 0;
   });
 
   // Conta equipamentos instalados por marca
@@ -271,17 +253,17 @@ async function calcularProgressoPorMarca(marca = null) {
     
     const marca = campusInfo.Marca;
     
-    if (tipo === 'switch') {
+    if (tipo === 'switch' && totaisPorMarca[marca]?.switches) {
       totaisPorMarca[marca].switches.instalados++;
-    } else if (tipo === 'nobreak') {
+    } else if (tipo === 'nobreak' && totaisPorMarca[marca]?.nobreaks) {
       totaisPorMarca[marca].nobreaks.instalados++;
     }
   });
 
   // Se filtro por marca específica, retorna apenas essa
-if (marca && marca !== "todas") {
-  return totaisPorMarca[marca] ? { [marca]: totaisPorMarca[marca] } : {};
-}
+  if (marca && marca !== "todas") {
+    return totaisPorMarca[marca] ? { [marca]: totaisPorMarca[marca] } : {};
+  }
   
   return totaisPorMarca;
 }
