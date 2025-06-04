@@ -256,30 +256,33 @@ function atualizarUIPorMarca(dados) {
   const container = document.getElementById("marca-progress-container");
   if (!container) return;
 
-  container.innerHTML = ""; // Limpa conteúdo anterior
+  container.innerHTML = '<h3>Progresso da Marca</h3>'; // Título fixo
 
   Object.entries(dados).forEach(([marca, totais]) => {
     const marcaDiv = document.createElement("div");
-    marcaDiv.className = "marca-progress";
+    marcaDiv.className = "resumo-item";
     
-    const switchPercent = (totais.switches.instalados / totais.switches.meta) * 100 || 0;
-    const nobreakPercent = (totais.nobreaks.instalados / totais.nobreaks.meta) * 100 || 0;
+    const switchPercent = Math.round((totais.switches.instalados / totais.switches.meta) * 100) || 0;
+    const nobreakPercent = Math.round((totais.nobreaks.instalados / totais.nobreaks.meta) * 100) || 0;
     
     marcaDiv.innerHTML = `
-      <h3>${marca}</h3>
-      <div class="progress-group">
+      <div class="resumo-header">
+        <i class="fas fa-building"></i>
+        <span>${marca}</span>
+      </div>
+      <div class="resumo-dados">
         <span>Switches:</span>
         <div class="progress-bar">
           <div class="progress" style="width: ${switchPercent}%"></div>
         </div>
-        <span>${totais.switches.instalados}/${totais.switches.meta} (${Math.round(switchPercent)}%)</span>
+        <span>${totais.switches.instalados}/${totais.switches.meta} (${switchPercent}%)</span>
       </div>
-      <div class="progress-group">
+      <div class="resumo-dados">
         <span>Nobreaks:</span>
         <div class="progress-bar">
           <div class="progress" style="width: ${nobreakPercent}%"></div>
         </div>
-        <span>${totais.nobreaks.instalados}/${totais.nobreaks.meta} (${Math.round(nobreakPercent)}%)</span>
+        <span>${totais.nobreaks.instalados}/${totais.nobreaks.meta} (${nobreakPercent}%)</span>
       </div>
     `;
     
