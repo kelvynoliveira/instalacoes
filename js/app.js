@@ -71,17 +71,6 @@ onAuthStateChanged(auth, (user) => {
   }
 });
 
-function configurarListenerEquipamentos() {
-  if (unsubscribeEquipamentos) unsubscribeEquipamentos();
-  
-  unsubscribeEquipamentos = onSnapshot(collection(db, "equipamentos"), (snapshot) => {
-   calcularResumoNacional();
-    calcularProgresso()
-      .then(aplicarCoresNoMapa)
-      .catch(error => console.error("Erro ao atualizar mapa:", error));
-  });
-}
-
 loginBtn.onclick = () => {
   signInWithPopup(auth, provider)
     .then(() => {
