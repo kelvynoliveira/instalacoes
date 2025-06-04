@@ -125,6 +125,34 @@ if (!campusInfo) {
   document.getElementById("panel-title").innerText = `${campusInfo.Marca} - ${campusInfo.Campus} (${progressoReal}% concluído)`;
   document.getElementById("campus-form").setAttribute("data-campus", campusKey);
 }
+
+// Adiciona listener para o filtro de marcas
+document.getElementById("marca-filter")?.addEventListener("change", async (e) => {
+  const marcaSelecionada = e.target.value;
+  const dados = await calcularProgressoPorMarca(marcaSelecionada);
+  atualizarUIPorMarca(dados);
+});
+
+// Chama na inicialização
+document.addEventListener("DOMContentLoaded", () => {
+  popularFiltroMarcas();
+  calcularProgressoPorMarca().then(atualizarUIPorMarca);
+});
+
+// Atualiza também quando os equipamentos mudam
+function configurarListenerEquipamentos() {
+  if (unsubscribeEquipamentos) unsubscribeEquipamentos();
+  
+  unsubscribeEquipamentos = onSnapshot(collection(db, "equipamentos"), async (snapshot) => {
+    calcularResumoNacional();
+    await calcularProgresso().then(aplicarCoresNoMapa);
+    
+    // Atualiza também o progresso por marca
+    const marcaSelecionada = document.getElementById("marca-filter")?.value || "todas";
+    const dados = await calcularProgressoPorMarca(marcaSelecionada);
+    atualizarUIPorMarca(dados);
+  });
+}
 // Função para calcular totais
 async function calcularResumoNacional() {
   try {
@@ -159,6 +187,115 @@ async function calcularResumoNacional() {
   } catch (error) {
     console.error("Erro ao calcular resumo:", error);
   }
+}
+
+// Função para popular o seletor de marcas
+function popularFiltroMarcas() {
+  const marcaFilter = document.getElementById("marca-filter");
+  if (!marcaFilter) return;
+
+  // Limpa opções existentes (mantendo apenas "Todas")
+  while (marcaFilter.options.length > 1) {
+    marcaFilter.remove(1);
+  }
+
+  // Obtém todas as marcas únicas dos campi
+  const marcasUnicas = [...new Set(campi.map(c => c.Marca))];
+  
+  marcasUnicas.forEach(marca => {
+    const option = document.createElement("option");
+    option.value = marca;
+    option.textContent = marca;
+    marcaFilter.appendChild(option);
+  });
+}
+
+// Função para calcular progresso por marca
+async function calcularProgressoPorMarca(marca = null) {
+  const equipamentosSnapshot = await getDocs(collection(db, "equipamentos"));
+  
+  // Objeto para armazenar totais por marca
+  const totaisPorMarca = {};
+  
+  // Inicializa estrutura para todas as marcas
+  campi.forEach(campus => {
+    const marcaKey = campus.Marca;
+    totaisPorMarca[marcaKey] = {
+      switches: { instalados: 0, meta: 0 },
+      nobreaks: { instalados: 0, meta: 0 }
+    };
+  });
+
+  // Calcula metas totais por marca
+  Object.entries(metas).forEach(([campusKey, meta]) => {
+    const campusInfo = campi.find(c => c.id === normalizarChave(campusKey));
+    if (!campusInfo) return;
+    
+    const marca = campusInfo.Marca;
+    totaisPorMarca[marca].switches.meta += meta.switch || 0;
+    totaisPorMarca[marca].nobreaks.meta += meta.nobreak || 0;
+  });
+
+  // Conta equipamentos instalados por marca
+  equipamentosSnapshot.forEach(doc => {
+    const data = doc.data();
+    const campusKey = normalizarChave(data.campus || "");
+    const tipo = (data.tipo || "").toLowerCase();
+    
+    const campusInfo = campi.find(c => c.id === campusKey);
+    if (!campusInfo || !tipo) return;
+    
+    const marca = campusInfo.Marca;
+    
+    if (tipo === 'switch') {
+      totaisPorMarca[marca].switches.instalados++;
+    } else if (tipo === 'nobreak') {
+      totaisPorMarca[marca].nobreaks.instalados++;
+    }
+  });
+
+  // Se filtro por marca específica, retorna apenas essa
+  if (marca && marca !== "todas") {
+    return { [marca]: totaisPorMarca[marca] };
+  }
+  
+  return totaisPorMarca;
+}
+
+// Função para atualizar a UI com os dados por marca
+function atualizarUIPorMarca(dados) {
+  const container = document.getElementById("marca-progress-container");
+  if (!container) return;
+
+  container.innerHTML = ""; // Limpa conteúdo anterior
+
+  Object.entries(dados).forEach(([marca, totais]) => {
+    const marcaDiv = document.createElement("div");
+    marcaDiv.className = "marca-progress";
+    
+    const switchPercent = (totais.switches.instalados / totais.switches.meta) * 100 || 0;
+    const nobreakPercent = (totais.nobreaks.instalados / totais.nobreaks.meta) * 100 || 0;
+    
+    marcaDiv.innerHTML = `
+      <h3>${marca}</h3>
+      <div class="progress-group">
+        <span>Switches:</span>
+        <div class="progress-bar">
+          <div class="progress" style="width: ${switchPercent}%"></div>
+        </div>
+        <span>${totais.switches.instalados}/${totais.switches.meta} (${Math.round(switchPercent)}%)</span>
+      </div>
+      <div class="progress-group">
+        <span>Nobreaks:</span>
+        <div class="progress-bar">
+          <div class="progress" style="width: ${nobreakPercent}%"></div>
+        </div>
+        <span>${totais.nobreaks.instalados}/${totais.nobreaks.meta} (${Math.round(nobreakPercent)}%)</span>
+      </div>
+    `;
+    
+    container.appendChild(marcaDiv);
+  });
 }
 
 // Função para atualizar a interface
