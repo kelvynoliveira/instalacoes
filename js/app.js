@@ -130,6 +130,7 @@ if (!campusInfo) {
 document.getElementById("marca-filter")?.addEventListener("change", async (e) => {
   const marcaSelecionada = e.target.value;
   const dados = await calcularProgressoPorMarca(marcaSelecionada);
+  console.log("Dados retornados:", dados);
   atualizarUIPorMarca(dados);
 });
 
@@ -225,6 +226,7 @@ async function calcularProgressoPorMarca(marca = null) {
     const metaCampus = metas[campusKey] || {};
     
     // Só adiciona a marca se tiver metas definidas
+    
     if (metaCampus.switch > 0 || metaCampus.nobreak > 0) {
       totaisPorMarca[marcaKey] ??= {
         switches: { instalados: 0, meta: 0 },
@@ -239,7 +241,14 @@ async function calcularProgressoPorMarca(marca = null) {
         totaisPorMarca[marcaKey].nobreaks.meta += metaCampus.nobreak;
       }
     }
+    
+    if (marca && marca !== "todas") {
+    return totaisPorMarca[marca] ? { [marca]: totaisPorMarca[marca] } : {};
+  }
+  
+  return totaisPorMarca;
   });
+  
 
   // Calcula metas totais por marca
   Object.entries(metas).forEach(([campusKey, meta]) => {
@@ -270,9 +279,9 @@ async function calcularProgressoPorMarca(marca = null) {
   });
 
   // Se filtro por marca específica, retorna apenas essa
-  if (marca && marca !== "todas") {
-    return { [marca]: totaisPorMarca[marca] };
-  }
+if (marca && marca !== "todas") {
+  return totaisPorMarca[marca] ? { [marca]: totaisPorMarca[marca] } : {};
+}
   
   return totaisPorMarca;
 }
@@ -284,13 +293,20 @@ function atualizarUIPorMarca(dados) {
 
   container.innerHTML = '<h3>Progresso da Marca</h3>';
 
-  Object.entries(dados).forEach(([marca, totais]) => {
+  // Verifica se há dados
+  if (Object.keys(dados).length === 0) {
+    container.innerHTML += '<p>Nenhum dado disponível para esta marca.</p>';
+    return;
+  }
+
+  // Processa cada marca nos dados
+  for (const [marca, totais] of Object.entries(dados)) {
     const marcaDiv = document.createElement("div");
     marcaDiv.className = "marca-progress";
     marcaDiv.innerHTML = `<h4>${marca}</h4>`;
     
-    // Só mostra switches se houver meta
-    if (totais.switches.meta > 0) {
+    // Processa switches
+    if (totais.switches?.meta > 0) {
       const switchPercent = Math.round((totais.switches.instalados / totais.switches.meta) * 100);
       marcaDiv.innerHTML += `
         <div class="progress-item">
@@ -303,8 +319,8 @@ function atualizarUIPorMarca(dados) {
       `;
     }
     
-    // Só mostra nobreaks se houver meta
-    if (totais.nobreaks.meta > 0) {
+    // Processa nobreaks
+    if (totais.nobreaks?.meta > 0) {
       const nobreakPercent = Math.round((totais.nobreaks.instalados / totais.nobreaks.meta) * 100);
       marcaDiv.innerHTML += `
         <div class="progress-item">
@@ -316,7 +332,9 @@ function atualizarUIPorMarca(dados) {
         </div>
       `;
     }
-});
+    
+    container.appendChild(marcaDiv);
+  }
 }
 // Função para atualizar a interface
 function atualizarUIResumo(dados) {
