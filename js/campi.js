@@ -180,15 +180,6 @@ export const campi = [
     Longitude: -44.244788
   },
   {
-    id: "UNA|UBERLANDIA",
-    Marca: "UNA",
-    Campus: "UBERLANDIA",
-    Cidade: "Uberlândia",
-    Estado: "MG",
-    Latitude: -18.936342,
-    Longitude: -48.255128
-  },
-  {
     id: "UNA|KARAIBA",
     Marca: "UNA",
     Campus: "KARAIBA",

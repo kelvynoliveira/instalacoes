@@ -1,10 +1,9 @@
 export const metas = {
     "UNA|CATALAO": { switch: 2 },
-    "UNA|KARAIBA": { switch: 2 },
+    "UNA|KARAIBA": { switch: 2, nobreak: 2  },
     "UNA|BETIM": { switch: 2, nobreak: 1 },
     "UNA|BOMDESPACHO": { switch: 2 },
     "UNA|SETELAGOAS": { switch: 2 },
-    "UNA|UBERLANDIA": { nobreak: 2 },
     "UNA|POUSOALEGRE": { switch: 2 },
     "AGES|SENHORDOBONFIM": { switch: 2, nobreak: 1 },
     "AGES|PARIPIRANGA": { switch: 1, nobreak: 1 },
